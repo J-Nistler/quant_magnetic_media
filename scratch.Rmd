@@ -3,6 +3,7 @@ the other kind of libraries
 ```{r,cache=T}
 library(tidyverse)
 library(ggrepel)
+library(pheatmap)
 ```
 
 ```{r,cache=T}
@@ -61,13 +62,36 @@ matrix_by_media <- t(as.matrix(datar[,-c(1,2)]))
 cluster_media <- hclust(dist(scale(matrix_by_media)))
 ```
 
+```{r,cache=T}
+pca_media <- prcomp(t(matrix_by_media[apply(matrix_by_media,1,sum)>0,]))
+pca_inst <- prcomp(t(matrix_by_inst[apply(matrix_by_inst,1,sum)>0,] ))
+
+media_pca_plot <- pca_media$rotation %>% 
+    {bind_cols(tibble(Format=rownames(.)),as.tibble(.))} %>%
+    select(Format,PC1,PC2,PC3,PC4,PC5,PC6) %>% 
+    ggplot()+theme_bw()+
+    aes(label=Format)+
+    geom_label_repel()
+media_pca_plot + aes(x=PC1,y=PC2)
+media_pca_plot + aes(x=PC3,y=PC4)
+media_pca_plot + aes(x=PC5,y=PC6)
+
+inst_pca_plot <- pca_inst$rotation %>% 
+    {bind_cols(tibble(Format=rownames(.)),as.tibble(.))} %>%
+    select(Format,PC1,PC2,PC3,PC4,PC5,PC6) %>% 
+    ggplot()+theme_bw()+
+    aes(label=Format)+
+    geom_label_repel()
+inst_pca_plot + aes(x=PC1,y=PC2)
+inst_pca_plot + aes(x=PC3,y=PC4)
+inst_pca_plot + aes(x=PC5,y=PC6)
+```
+
 
 ```{r,fig.height=9,fig.width=9,cache=T}
-library(pheatmap)
 
 row_ann <- data.frame(Collection=str_c("C_",as.character(rownames(matrix_by_inst)[cluster_inst$order])))
 rownames(row_ann) <- as.character(row_ann[[1]])
-
 col_ann <- data.frame(Format=rownames(matrix_by_media)[cluster_media$order]) %>%
     left_join(totals_and_risks,by="Format") %>% select(-variable)
 rownames(col_ann) <- col_ann[[1]]
