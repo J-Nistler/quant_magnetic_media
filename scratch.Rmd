@@ -63,8 +63,8 @@ cluster_media <- hclust(dist(scale(matrix_by_media)))
 ```
 
 ```{r,cache=T}
-pca_media <- prcomp(t(matrix_by_media[apply(matrix_by_media,1,sum)>0,]))
-pca_inst <- prcomp(t(matrix_by_inst[apply(matrix_by_inst,1,sum)>0,] ))
+pca_media <- prcomp(t(matrix_by_media[apply(matrix_by_media,1,sum)>0,]),center=T,scale=T)
+pca_inst <- prcomp(t(matrix_by_inst[apply(matrix_by_inst,1,sum)>0,] ),center=T,scale=T)
 
 media_pca_plot <- pca_media$rotation %>% 
     {bind_cols(tibble(Format=rownames(.)),as.tibble(.))} %>%
