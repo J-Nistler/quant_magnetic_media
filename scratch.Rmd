@@ -1,3 +1,14 @@
+---
+title: "A Quantitative Approach to the Status of the Magnetic Media Crisis: From Hoping to Knowing"
+author:
+- "Sarah Nguyen"
+- "Jared Nistler"
+- "Darach Miller"
+tags:[Archives management, digitization, preservation, magnetic media, audio/visual media]
+abstract: "This is a quantitative study on the status of magnetic media collections. Data collected from forty-nine archive institutions, across the United States and Canada, reveals the degree institutions are at risk in losing historical and cultural magnetic records due to the lack of bandwidth in digitizing collections, substandard environmental conditions, and the rapid deterioration rate of magnetic carriers. From a ten-question survey, data reflected archivists managing magnetic media collections are not confident in their assessments of the once-ubiquitous materials. Numbers reveal cognitive dissonance from clear discrepancies between quantities of format type compared to archivists’ self-reflection on preservation practice and estimated digitization rates before obsolescence. The majority expressed confidence in digitizing 75% or more of their collection, but calculating that against actual digitization rates left more magnetic items undigitized. The data also displayed visible trend lines between carrier type risk-level and the institutions holding similar quantities of each format type. This could help with the challenge of the medium’s limited lifespan as digitization hubs can be concentrated near those institutions with similar format types. In a race against the clock, archives are limited by funds and time as they attempt to preserve valuable media before it degrades into unreadability. Data from this study will offer numbers to support institutions and archivists to obtain funding and prepare for the digitization to preservation processes before twenty years pass and the magnetic media content is just a sticky memory."
+
+---
+
 the other kind of libraries
 
 ```{r,cache=T}
@@ -17,6 +28,32 @@ pdatar <- datar %>%
 risk_factors <- read_tsv("risk_factors.tsv") %>%
     mutate(Risk=factor(Risk,levels=c("Low","Moderate","High","Very High","Extremely High")))
 ```
+
+## Respondents by Institution Types
+
+This research question specifically identified academic libraries as the main focus, but
+other archival institutions have enthusiastically participated in our survey. Despite a chunk of participants being non-academic libraries, the research scope did not change and data from these other institutions are not included in the final analysis. However, the data trends are interesting and can be applied to other institutions, there may be an opportunity for further research.
+
+
+## Distribution of Institution Facilities Environmental Conditions
+
+Each questionnaire participant was asked to self-grade the environmental conditions of
+the infrastructure which the magnetic media items are stored within. The different
+environmental archival levels are based on the Video Preservation Fact Sheet from AMIA.26
+While the majority of the participants boast to maintain “temperature/humidity controlled” for decent preservation of magnetic media, the lack of “actively harmful” and “uncomfortable for humans” environments is a huge indicator that the survey participants are self-selecting. Given the number of institutions who are unable to account for the number of items in their collection, this graph shows the study is missing input from the “lone ranger archivists.”
+
+
+## Distribution of Institutional Self-Reflection on A/V Digitization Practices
+
+This graph of self-reflection on digitization practices must be taken with a grain of salt
+since it is considering the judgment of the archivist managing the collection itself. This is their job, and it is less likely for someone to openly and truthfully speak poorly of their place of employment practices, even if they are answering anonymously. On the other hand, it is encouraging to see a positive-skewed bell curve, showing hope and potential in institutions investment into A/V digitization practices.
+
+
+## Institutional Estimate of the Percentage of Magnetic Media that will be Digitized before Estimated to be Unplayable
+
+Of the thirty-six respondents who chose to estimate how much magnetic material they would be able to digitize, eight—nearly a quarter—were confident they would process every item in their collection. However, almost as many institutions expressed doubt that they would digitize even a quarter of their collections before decay made their tapes unplayable. From a cursory examination, there does not appear to be a strict correlation between the size of the collection and the estimated digitization rate. Indiana University Bloomington, with 226,911 items, is confident they will digitize 99% of their holdings, while Wartburg College is bearish about the prospects for their 15,308 items, estimating they will only digitize 10%. Table 2: Respondent Institutions’ Digitization Progress Rates lists institutions’ current progress rate, calculated by their yearly digitization rate as a percentage of their total collection.
+
+## Totals of format type and their obsolescence risk factor (JN)
 
 ```{r,cache=T}
 totals_and_risks <- pdatar %>% filter(variable!="Total Items") %>%
@@ -42,6 +79,7 @@ g<- totals_and_risks%>%
 g
 ```
 
+## Estimated Number of Each Format
 
 ```{r,fig.height=5,fig.width=7,cache=T}
 g <- pdatar %>%
@@ -58,6 +96,9 @@ g <- pdatar %>%
     xlab("Format")
 g
 ```
+This box plot mirrors what we've seen in that there are noticeable high quantities of VHS and open reel audio, but this makes it more apparent where there are instituions holding an skewed amount of a format type within their collection. It's clear that there are a lot of data points in VHS. Nearly all participating institutions have at least one VHS tape. On the other hand, there are only about four or five archives that need to deal with Digital 8.
+
+
 
 
 ```{r,fig.height=5,fig.width=7,cache=T}
@@ -85,6 +126,9 @@ cluster_inst <- hclust(dist(scale(matrix_by_inst)))
 matrix_by_media <- t(as.matrix(datar[,-c(1,2)]))
 cluster_media <- hclust(dist(scale(matrix_by_media)))
 ```
+## Magnetic Media Collections by Region and Climate
+
+This chart will replace the original PCA charts. Instead, we will focus on the variability of institutions collections considering their geographic region, the region's climate properties (e.g. humidity, temp, etc.), and the reported environmental conditions of the archive itself. We might consider the quantity of each format according to region, but not sure how that will work or what results that will give us. 
 
 ```{r,cache=T}
 pca_media <- prcomp(t(matrix_by_media[apply(matrix_by_media,1,sum)>0,]),center=T,scale=T)
@@ -210,7 +254,7 @@ g <- pheatmap( log10(datar[,-c(1,2)]+400),
 g
 ```
 
+## Final Overview Heat Map
 
 
-
-
+This heat map illustrates an aggregation of the above charts and graphs. The hierarchical clustering shows how each format is related or unrelated considering the factors of obsolesence risk and quantity held within participating archives' collections. At the top of the chart, there are two major goups: (1) VHS, open reel audio, and compact cassettes, and (2) all other formats. This distinction is from the quantity that instutions hold, in that group 1 is more likely to have a higher quantity than group 2. From quantity and risk factor, there is a noticeable relationship with Betacam and u-matic. This suggests that if an archive carries of one of these format types, they are likely to also have the latter in their collection. This further leads to the idea that training or programming for Betacam and U-matic together could be an efficient approach to dealing with those collections.

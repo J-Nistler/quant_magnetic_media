@@ -9,5 +9,5 @@ This repository includes all research, data, and analyses related to the quantit
 
 By: [Sarah Nguyen](https://michi-gato.github.io/), [Jared Nistler](https://jnistler.com/), [Darach Miller](http://rhesis.com/), Brian Click, and Michael Kuster
 
-Original contents licensed CC-BY-NC-SA 2019.
+Original contents licensed [CC-BY-NC-SA](https://creativecommons.org/licenses/by-nc-sa/3.0/) 2019.
 
