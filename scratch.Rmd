@@ -25,15 +25,20 @@ totals_and_risks <- pdatar %>% filter(variable!="Total Items") %>%
     mutate(Format=factor(variable,levels=variable)) %>%
     left_join(risk_factors,by="Format") %>%
     select(-Quantity)
+
+totals_and_risks
 ```
 
 ```{r,fig.height=9,fig.width=9,cache=T}
 g<- totals_and_risks%>%
-    filter(Total>0)%>%
+    filter(Total>0,!is.na(Risk))%>%
     ggplot()+theme_bw()+
     aes(x=Risk,y=Total)+
     theme(axis.text.x=element_text(angle=90))+
-    geom_label_repel(aes(label=Format))
+    geom_label_repel(aes(label=Format))+
+    ylab("Total items across survey")+
+    xlab("")+
+    ggtitle("Total counts of high risk magnetic media")
 g
 ```
 
@@ -50,6 +55,25 @@ g <- pdatar %>%
     scale_y_log10(breaks=c(10,100,1000,10000,1000000))+
     theme(axis.text.x=element_text(angle=90))+
     ylab("Estimated number of items in collection of that format")+
+    xlab("Format")
+g
+```
+
+
+```{r,fig.height=5,fig.width=7,cache=T}
+g <- pdatar %>%
+    spread(variable,value) %>%
+    gather(variable,value,-`Institution-CollectionKey`,-`Total Items`) %>%
+    mutate(proportion=value/`Total Items`) %>%
+    mutate(variable=factor(variable,levels=arrange(totals_and_risks,-Total)$Format)) %>%
+    filter(variable!="Total Items")%>%
+    filter(proportion>0)%>%
+    ggplot()+theme_bw()+
+    geom_boxplot(outlier.alpha=0)+
+    geom_dotplot(binaxis="y",stackdir="center",alpha=0.5,binwidth=0.01)+
+    aes(x=variable,y=proportion)+
+    theme(axis.text.x=element_text(angle=90))+
+    ylab("Fraction of collection in that format")+
     xlab("Format")
 g
 ```
@@ -87,29 +111,106 @@ inst_pca_plot + aes(x=PC3,y=PC4)
 inst_pca_plot + aes(x=PC5,y=PC6)
 ```
 
-
 ```{r,fig.height=9,fig.width=9,cache=T}
 
-row_ann <- data.frame(Collection=str_c("C_",as.character(rownames(matrix_by_inst)[cluster_inst$order])))
+row_ann <- data.frame(
+    Collection=str_c("C_",as.character(rownames(matrix_by_inst)[cluster_inst$order]))
+    )
 rownames(row_ann) <- as.character(row_ann[[1]])
+
 col_ann <- data.frame(Format=rownames(matrix_by_media)[cluster_media$order]) %>%
-    left_join(totals_and_risks,by="Format") %>% select(-variable)
+    left_join(totals_and_risks,by="Format") %>% select(-variable) %>%
+    rename(`Total Items`=Total,`Format Risk`=Risk) %>%
+    select(-`Total Items`)
 rownames(col_ann) <- col_ann[[1]]
-col_ann <- col_ann[,-1]
+col_ann <- col_ann %>% select(-Format)
+
+count_palette <- c("#FFFFFF",
+    colorRampPalette((RColorBrewer::brewer.pal(n=7,name="YlGnBu")))(99)
+    )
 
 g <- pheatmap( log10(datar[,-c(1,2)]+400),
-    color=c("#FFFFFF",colorRampPalette((RColorBrewer::brewer.pal(n=7,name="YlGnBu")))(99)),
+    color=count_palette,
     correlation_distance_rows="pearson",
     correlation_distance_cols="pearson",
+    legend_breaks=log10(c(10,100,1000,3000,1e4,2.5e4,5e4)),
+    legend_labels=c(10,100,1000,3000,1e4,2.5e4,5e4),
     cluster_rows=cluster_inst,
     cluster_cols=cluster_media,
     show_rownames=F,show_colnames=T,
     #annotation_row=row_ann,
     annotation_col=col_ann,
-    annotation_colors=NULL,
     annotation_legend=T)
 g
 ```
+
+
+```{r,fig.height=9,fig.width=9,cache=T}
+
+valz <- log10(unlist(datar[,-c(1,2)])+1)
+
+col_ann <- data.frame(Format=rownames(matrix_by_media)[cluster_media$order]) %>%
+    left_join(totals_and_risks,by="Format") %>% select(-variable) %>%
+    rename(`Total Items`=Total,`Format Risk`=Risk) %>%
+    select(-`Total Items`)
+rownames(col_ann) <- col_ann[[1]]
+col_ann <- col_ann %>% select(-Format)
+
+counts_legend <- HeatmapAnnotation(
+    heatmap_legend_param = list(
+        title = "Item counts", 
+        at=log10(c(10,1000,1e4,5e4)),
+        labels=c(10,1000,1e4,5e4),
+        heatmap_legend_side="bottom"
+        )
+    )
+
+risk_annotation <- HeatmapAnnotation(
+    `Format Risk`=col_ann$`Format Risk`,
+    col=list(`Format Risk`=c(
+            `Extremely High`="#7b3294",`Very High`="#c2a5cf",
+            `High`="#a6dba0",`Moderate`="#008837"
+    )   )   )
+the_heatmap <- Heatmap(
+    log10(datar[,-c(1,2)]+1),
+    col=colorRamp2(c(min(valz),median(valz),max(valz)),c("#ffffff", "#fefefe", "#000000")),
+    top_annotation=risk_annotation,
+    heatmap_legend_param = list(
+        title = "Item counts",
+        at=log10(c(10,1000,1e4,5e4)),
+        labels=c(10,1000,1e4,5e4),
+        legend_height = unit(6, "cm")
+        )
+    )
+ht_list <- the_heatmap 
+g <- draw(ht_list, heatmap_legend_side = "right", annotation_legend_side = "right")
+g
+
+png("heatmap.png")
+g
+dev.off()
+
+
+count_palette <- c("#FFFFFF",
+    colorRampPalette((RColorBrewer::brewer.pal(n=7,name="YlGnBu")))(99)
+    )
+
+g <- pheatmap( log10(datar[,-c(1,2)]+400),
+    color=count_palette,
+    correlation_distance_rows="pearson",
+    correlation_distance_cols="pearson",
+    legend_breaks=log10(c(10,100,1000,3000,1e4,2.5e4,5e4)),
+    legend_labels=c(10,100,1000,3000,1e4,2.5e4,5e4),
+    cluster_rows=cluster_inst,
+    cluster_cols=cluster_media,
+    show_rownames=F,show_colnames=T,
+    #annotation_row=row_ann,
+    annotation_col=col_ann,
+    annotation_legend=T)
+g
+```
+
+
 
 
 
