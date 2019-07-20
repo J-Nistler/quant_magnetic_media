@@ -63,7 +63,7 @@ library(circlize)
 raw_datar <- read_csv("survey_data_2019.csv",
     col_names=c(
         "Key","State","InstitutionType","TotalItems",
-        "Unstructured_StorageConditions",
+        "StorageConditions",
         "Unstructured_StorageHistory",
         "Unstructured_CompletionEstimate",
         "PracticeSelfAssesment",
@@ -107,12 +107,11 @@ reasonable_responses %>%
     aes(x=InstitutionType)+
     geom_bar()+
     scale_x_discrete(limits=names(sort(table(.$InstitutionType),decreasing=T)))+
+    geom_label(aes(label=..count..,y=..count..),stat="count")+
     xlab("Institution type")+
     ylab("Responses")
     }
 ```
-
-
 
 This research question specifically identified academic libraries as the main
 focus, but other archival institutions have enthusiastically participated in
@@ -133,6 +132,31 @@ research.
 
 
 ## Distribution of Institution Facilities Environmental Conditions
+
+
+``r sum(is.na(reasonable_responses$StorageConditions))`` didn't respond
+
+```{r responses_by_storage_conditions,cache=T,fig.height=7}
+reasonable_responses %>%
+    filter(!is.na(StorageConditions)) %>%
+    {
+    ggplot(.)+theme_bw()+
+    aes(x=StorageConditions)+
+    geom_bar()+
+    scale_x_discrete(limits=c(
+            "Archival (vacuum sealed items, cold storage, etc.)",
+            "Temperature/Humidity controlled",
+            "Room temperature",
+            "Uncomfortable for human",
+            "Actively harmful (dirty, hot, humid, etc.)"
+            )
+        )+
+    geom_label(aes(label=..count..,y=..count..),stat="count")+
+    theme(axis.text.x=element_text(angle=90))+
+    xlab("")+
+    ylab("Responses")
+    }
+```
 
 Each questionnaire participant was asked to self-grade the environmental
 conditions of the infrastructure which the magnetic media items are stored
@@ -157,6 +181,66 @@ a positive-skewed bell curve, showing hope and potential in institutions
 investment into A/V digitization practices.
 
 
+```{r responses_by_self_reflection,cache=T,fig.height=7}
+reasonable_responses %>%
+    filter(!is.na(PracticeSelfAssesment)) %>%
+    {
+    ggplot(.)+theme_bw()+
+    aes(x=PracticeSelfAssesment)+
+    geom_bar()+
+    scale_x_discrete(limits=c(
+            "Excellent",
+            "Above Average",
+            "Average",
+            "Below Average",
+            "Poor"
+            )
+        )+
+    geom_label(aes(label=..count..,y=..count..),stat="count")+
+    theme(axis.text.x=element_text(angle=90))+
+    xlab("")+
+    ylab("Responses")
+    }
+```
+
+Let's compare them.
+
+```{r responses_self_versus_storage,cache=T,fig.height=5}
+reasonable_responses %>%
+    filter(!is.na(PracticeSelfAssesment)) %>%
+    filter(!is.na(StorageConditions)) %>%
+    {
+    ggplot(.)+theme_bw()+
+    aes(x=PracticeSelfAssesment,y=StorageConditions)+
+    stat_bin2d(geom="point",aes(size=..count..),shape=15)+
+    guides(fill=F)+
+    scale_x_discrete(limits=c(
+            "Excellent",
+            "Above Average",
+            "Average",
+            "Below Average",
+            "Poor"
+            )
+        )+
+    scale_y_discrete(limits=c(
+            "Archival (vacuum sealed items, cold storage, etc.)",
+            "Temperature/Humidity controlled",
+            "Room temperature",
+            "Uncomfortable for human",
+            "Actively harmful (dirty, hot, humid, etc.)"
+            )
+        )+
+    scale_size("Responses")+
+    theme(axis.text.x=element_text(angle=90))+
+    xlab("Self-assessment of archival skillz")+
+    ylab("Self-assessment of storage conditions")
+    }
+```
+
+point types in R
+http://www.sthda.com/english/wiki/r-plot-pch-symbols-the-different-point-shapes-available-in-r
+
+
 ## Institutional Estimate of the Percentage of Magnetic Media that will be Digitized before Estimated to be Unplayable
 
 Of the thirty-six respondents who chose to estimate how much magnetic material
@@ -172,6 +256,12 @@ holdings, while Wartburg College is bearish about the prospects for their
 Institutions’ Digitization Progress Rates lists institutions’ current progress
 rate, calculated by their yearly digitization rate as a percentage of their
 total collection.
+
+
+# Can y'all read this and turn it into numbers?
+
+
+
 
 ```{r}
 
