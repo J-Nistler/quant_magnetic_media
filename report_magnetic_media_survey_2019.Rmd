@@ -36,28 +36,58 @@ abstract: |
     pass and the magnetic media content is just a sticky memory.
 ---
 
-the other kind of libraries
+use a pandoc template (already existing?) to put abstract with title up top
 
-```{r,cache=T}
+# Intro, etc.
+
+- what role does magnetic media have in our history/culture/hearts/minds/whatever?
+- what is it?
+- how degrade?
+- why do a survey? to prioritize investment in training, documentation, staff, and digitization cores, or whatever y'all think is appropriate
+
+# Methods
+
+# Results
+
+```{r,cache=T,echo=F}
+# Here's loading libraries, that other kind of library
 library(tidyverse)
 library(ggrepel)
 library(ComplexHeatmap)
 library(circlize)
 ```
 
-```{r,cache=T}
-datar <- read_csv("RESULTS_V2_181209_Magnetic Media Survey - Some Calculations.csv") %>%
-    filter(complete.cases(.[,-c(1,2)])) 
+```{r,cache=T,echo=F}
+raw_datar <- read_csv("survey_data_2019.csv",
+    col_names=c(
+        "Key","State","InstitutionType","TotalItems",
+        "Unstructured_StorageConditions",
+        "Unstructured_StorageHistory",
+        "Unstructured_CompletionEstimate",
+        "PracticeSelfAssesment",
+        "Percentage_Open_Reel_Video","Percentage_U-Matic","Percentage_Betamax",
+        "Percentage_VHS_&_S-VHS","Percentage_Betacam_&_Betacam_SP",
+        "Percentage_Video_8_&_Hi8","Percentage_D2","Percentage_D3",
+        "Percentage_DVCAM","Percentage_MiniDV","Percentage_DVCPro",
+        "Percentage_Digital_8","Percentage_Open_Reel_Audio",
+        "Percentage_Compact_Cassette","Percentage_Microcassette",
+        "Percentage_DAT","Percentage_DTRS","Percentage_F-1","Percentage_DCC",
+        "Percentage_8-Track","Percentage_Other")
+    )
 
-pdatar <- datar %>% 
-    gather(variable,value,-`Institution-CollectionKey`) %>%
-    mutate(value=as.numeric(value)) 
+responses_with_totals <- distinct(filter(raw_datar,!is.na(raw_datar$TotalItems)))
 
 risk_factors <- read_tsv("risk_factors.tsv") %>%
-    mutate(Risk=factor(Risk,levels=c("Low","Moderate","High","Very High","Extremely High")))
+    mutate(Risk=factor(Risk,
+            levels=c("Low","Moderate","High","Very High","Extremely High")
+        )   ) %>%
+    select(-Quantity) %>%
+    {setNames(.$Risk,.$Format)}
 ```
 
-Dada for basic graphs below: https://github.com/darachm/magnets_how_do_they_work/blob/master/MagMedia_basicCharts.csv
+
+We recieved ```r nrow(raw_datar)``` responses
+
 
 ## Respondents by Institution Types
 
