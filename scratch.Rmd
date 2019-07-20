@@ -1,10 +1,15 @@
-$---
+---
 title: "A Quantitative Approach to the Status of the Magnetic Media Crisis: From Hoping to Knowing"
 author:
     - "Sarah Nguyen"
     - "Jared Nistler"
     - "Darach Miller"
-tags: [ Archives management, digitization, preservation, magnetic media, audio/visual media]
+tags: 
+    - archives management
+    - digitization
+    - preservation
+    - magnetic media
+    - audio/visual media
 abstract: |
     This is a quantitative study on the status of magnetic media collections. 
     Data collected from forty-nine archive institutions, across the United 
