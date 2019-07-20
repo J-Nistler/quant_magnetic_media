@@ -36,7 +36,10 @@ abstract: |
     pass and the magnetic media content is just a sticky memory.
 ---
 
-use a pandoc template (already existing?) to put abstract with title up top
+```{r set_global_knit_options,echo=F,message=F,error=T}
+knitr::opts_chunk$set(echo=F,message=F,error=T)
+```
+
 
 # Intro, etc.
 
@@ -49,15 +52,14 @@ use a pandoc template (already existing?) to put abstract with title up top
 
 # Results
 
-```{r,cache=T,echo=F}
-# Here's loading libraries, that other kind of library
+```{r load_libraries,cache=T}
 library(tidyverse)
 library(ggrepel)
 library(ComplexHeatmap)
 library(circlize)
 ```
 
-```{r,cache=T,echo=F}
+```{r read_data_risks,cache=T}
 raw_datar <- read_csv("survey_data_2019.csv",
     col_names=c(
         "Key","State","InstitutionType","TotalItems",
@@ -72,30 +74,60 @@ raw_datar <- read_csv("survey_data_2019.csv",
         "Percentage_Digital_8","Percentage_Open_Reel_Audio",
         "Percentage_Compact_Cassette","Percentage_Microcassette",
         "Percentage_DAT","Percentage_DTRS","Percentage_F-1","Percentage_DCC",
-        "Percentage_8-Track","Percentage_Other")
+        "Percentage_8-Track","Percentage_Other"),
+    skip=1
     )
 
-responses_with_totals <- distinct(filter(raw_datar,!is.na(raw_datar$TotalItems)))
+reasonable_responses <- filter(raw_datar,!is.na(InstitutionType)) 
 
-risk_factors <- read_tsv("risk_factors.tsv") %>%
+responses_with_totals <- distinct(
+        filter(reasonable_responses,!is.na(reasonable_responses$TotalItems))
+        )
+
+risk_factors <- read_tsv("risk_assesment.tsv") %>%
     mutate(Risk=factor(Risk,
             levels=c("Low","Moderate","High","Very High","Extremely High")
         )   ) %>%
-    select(-Quantity) %>%
     {setNames(.$Risk,.$Format)}
 ```
 
-
-We recieved ```r nrow(raw_datar)``` responses
+We received ``r nrow(reasonable_responses)`` responses. The survey asked for
+estimates of proportion of the collection that is in each format and an 
+estimate of the total collection size.
+``r nrow(reasonable_responses)-nrow(responses_with_totals)`` responses
+lacked estimates of total collection size.
 
 
 ## Respondents by Institution Types
 
+```{r responses_by_instutition_type,cache=T}
+reasonable_responses %>%
+    {
+    ggplot(.)+theme_bw()+
+    aes(x=InstitutionType)+
+    geom_bar()+
+    scale_x_discrete(limits=names(sort(table(.$InstitutionType),decreasing=T)))+
+    xlab("Institution type")+
+    ylab("Responses")
+    }
+```
+
+
+
 This research question specifically identified academic libraries as the main
 focus, but other archival institutions have enthusiastically participated in
-our survey. Despite a chunk of participants being non-academic libraries, the
+our survey. 
+
+Despite a chunk of participants being non-academic libraries, the
 research scope did not change and data from these other institutions are not
-included in the final analysis. However, the data trends are interesting and
+included in the final analysis. 
+
+``r sum(reasonable_responses$InstitutionType!="Academic")``
+of these are not "Academic"
+
+Shouldn't we include all of these? What's the difference?
+
+However, the data trends are interesting and
 can be applied to other institutions, there may be an opportunity for further
 research.
 
@@ -141,146 +173,104 @@ Institutions’ Digitization Progress Rates lists institutions’ current progre
 rate, calculated by their yearly digitization rate as a percentage of their
 total collection.
 
-## Totals of format type and their obsolescence risk factor (JN)
+```{r}
 
-```{r,cache=T}
-totals_and_risks <- pdatar %>% filter(variable!="Total Items") %>%
-    group_by(variable) %>% summarize(Total=sum(value,na.rm=T)) %>%
-    arrange(Total) %>%
-    mutate(Format=factor(variable,levels=variable)) %>%
-    left_join(risk_factors,by="Format") %>%
-    select(-Quantity)
-
-totals_and_risks
-```
-
-```{r,fig.height=9,fig.width=9,cache=T}
-g<- totals_and_risks%>%
-    filter(Total>0,!is.na(Risk))%>%
-    ggplot()+theme_bw()+
-    aes(x=Risk,y=Total)+
-    theme(axis.text.x=element_text(angle=90))+
-    geom_label_repel(aes(label=Format))+
-    ylab("Total items across survey")+
-    xlab("")+
-    ggtitle("Total counts of high risk magnetic media")
-g
-```
-
-## Estimated Number of Each Format
-
-```{r,fig.height=5,fig.width=7,cache=T}
-g <- pdatar %>%
-    mutate(variable=factor(variable,levels=arrange(totals_and_risks,-Total)$Format)) %>%
-    filter(variable!="Total Items")%>%
-    filter(value>0)%>%
-    ggplot()+theme_bw()+
-    geom_boxplot(outlier.alpha=0)+
-    geom_dotplot(binaxis="y",stackdir="center",dotsize=1.0,alpha=0.5,binwidth=0.05)+
-    aes(x=variable,y=value)+
-    scale_y_log10(breaks=c(10,100,1000,10000,1000000))+
-    theme(axis.text.x=element_text(angle=90))+
-    ylab("Estimated number of items in collection of that format")+
-    xlab("Format")
-g
-```
-
-This box plot mirrors what we've seen in that there are noticeable high
-quantities of VHS and open reel audio, but this makes it more apparent where
-there are instituions holding an skewed amount of a format type within their
-collection. It's clear that there are a lot of data points in VHS. Nearly all
-participating institutions have at least one VHS tape. On the other hand, there
-are only about four or five archives that need to deal with Digital 8.
-
-
-
-
-```{r,fig.height=5,fig.width=7,cache=T}
-g <- pdatar %>%
-    spread(variable,value) %>%
-    gather(variable,value,-`Institution-CollectionKey`,-`Total Items`) %>%
-    mutate(proportion=value/`Total Items`) %>%
-    mutate(variable=factor(variable,levels=arrange(totals_and_risks,-Total)$Format)) %>%
-    filter(variable!="Total Items")%>%
-    filter(proportion>0)%>%
-    ggplot()+theme_bw()+
-    geom_boxplot(outlier.alpha=0)+
-    geom_dotplot(binaxis="y",stackdir="center",alpha=0.5,binwidth=0.01)+
-    aes(x=variable,y=proportion)+
-    theme(axis.text.x=element_text(angle=90))+
-    ylab("Fraction of collection in that format")+
-    xlab("Format")
-g
-```
-
-```{r,cache=T}
-matrix_by_inst <- as.matrix(datar[,-c(1,2)])
-rownames(matrix_by_inst) <- datar[,1][[1]]
-cluster_inst <- hclust(dist(scale(matrix_by_inst))) 
-matrix_by_media <- t(as.matrix(datar[,-c(1,2)]))
-cluster_media <- hclust(dist(scale(matrix_by_media)))
-```
-## Magnetic Media Collections by Region and Climate
-
-This chart will replace the original PCA charts. Instead, we will focus on the
-variability of institutions collections considering their geographic region,
-the region's climate properties (e.g. humidity, temp, etc.), and the reported
-environmental conditions of the archive itself. We might consider the quantity
-of each format according to region, but not sure how that will work or what
-results that will give us. 
-
-
-
-```{r,fig.height=9,fig.width=9,cache=T}
-
-heatmap_datar <- datar[complete.cases(datar[,-c(1,2)]),]
-
-valz <- log10(unlist(heatmap_datar[,-c(1,2)])+1)
-
-col_ann <- data.frame(Format=rownames(matrix_by_media)[cluster_media$order]) %>%
-    left_join(totals_and_risks,by="Format") %>% select(-variable) %>%
-    rename(`Total Items`=Total,`Format Risk`=Risk) %>%
-    select(-`Total Items`)
-rownames(col_ann) <- col_ann[[1]]
-col_ann <- col_ann %>% select(-Format)
-
-risk_annotation <- HeatmapAnnotation(
-    `Format Risk`=col_ann$`Format Risk`,
-    col=list(`Format Risk`=c(
-            `Extremely High`="#7b3294",`Very High`="#c2a5cf",
-            `High`="#a6dba0",`Moderate`="#008837"
-    )   )   )
-the_heatmap <- Heatmap(
-    log10(heatmap_datar[,-c(1,2)]+1),
-    top_annotation=risk_annotation,
-    col=colorRamp2(
-        c(min(valz),median(valz),max(valz)),
-        c("#ffffff", "#fefefe", "#000000")
-        ),
-    heatmap_legend_param = list(
-        title="Item counts", 
-        at=log10(c(10+1,1000+1,1e4+1,5e4+1)),
-        labels=c(10,1000,1e4,5e4),
-        legend_height = unit(6, "cm"),
-        heatmap_legend_side="bottom"
-        )
-    )
-ht_list <- the_heatmap 
-g <- draw(ht_list, heatmap_legend_side = "right", annotation_legend_side = "right")
-g
-
-png("heatmap.png")
-g
-dev.off()
-```
-
-
-```{r pheatmap,echo=F,eval=F}
-#library(pheatmap)
-#row_ann <- data.frame(
-#    Collection=str_c("C_",as.character(rownames(matrix_by_inst)[cluster_inst$order]))
-#    )
-#rownames(row_ann) <- as.character(row_ann[[1]])
+#
+### Totals of format type and their obsolescence risk factor (JN)
+#
+#```{r,cache=T}
+#totals_and_risks <- pdatar %>% filter(variable!="Total Items") %>%
+#    group_by(variable) %>% summarize(Total=sum(value,na.rm=T)) %>%
+#    arrange(Total) %>%
+#    mutate(Format=factor(variable,levels=variable)) %>%
+#    left_join(risk_factors,by="Format") %>%
+#    select(-Quantity)
+#
+#totals_and_risks
+#```
+#
+#```{r,fig.height=9,fig.width=9,cache=T}
+#g<- totals_and_risks%>%
+#    filter(Total>0,!is.na(Risk))%>%
+#    ggplot()+theme_bw()+
+#    aes(x=Risk,y=Total)+
+#    theme(axis.text.x=element_text(angle=90))+
+#    geom_label_repel(aes(label=Format))+
+#    ylab("Total items across survey")+
+#    xlab("")+
+#    ggtitle("Total counts of high risk magnetic media")
+#g
+#```
+#
+### Estimated Number of Each Format
+#
+#```{r,fig.height=5,fig.width=7,cache=T}
+#g <- pdatar %>%
+#    mutate(variable=factor(variable,levels=arrange(totals_and_risks,-Total)$Format)) %>%
+#    filter(variable!="Total Items")%>%
+#    filter(value>0)%>%
+#    ggplot()+theme_bw()+
+#    geom_boxplot(outlier.alpha=0)+
+#    geom_dotplot(binaxis="y",stackdir="center",dotsize=1.0,alpha=0.5,binwidth=0.05)+
+#    aes(x=variable,y=value)+
+#    scale_y_log10(breaks=c(10,100,1000,10000,1000000))+
+#    theme(axis.text.x=element_text(angle=90))+
+#    ylab("Estimated number of items in collection of that format")+
+#    xlab("Format")
+#g
+#```
+#
+#This box plot mirrors what we've seen in that there are noticeable high
+#quantities of VHS and open reel audio, but this makes it more apparent where
+#there are instituions holding an skewed amount of a format type within their
+#collection. It's clear that there are a lot of data points in VHS. Nearly all
+#participating institutions have at least one VHS tape. On the other hand, there
+#are only about four or five archives that need to deal with Digital 8.
+#
+#
+#
+#
+#```{r,fig.height=5,fig.width=7,cache=T}
+#g <- pdatar %>%
+#    spread(variable,value) %>%
+#    gather(variable,value,-`Institution-CollectionKey`,-`Total Items`) %>%
+#    mutate(proportion=value/`Total Items`) %>%
+#    mutate(variable=factor(variable,levels=arrange(totals_and_risks,-Total)$Format)) %>%
+#    filter(variable!="Total Items")%>%
+#    filter(proportion>0)%>%
+#    ggplot()+theme_bw()+
+#    geom_boxplot(outlier.alpha=0)+
+#    geom_dotplot(binaxis="y",stackdir="center",alpha=0.5,binwidth=0.01)+
+#    aes(x=variable,y=proportion)+
+#    theme(axis.text.x=element_text(angle=90))+
+#    ylab("Fraction of collection in that format")+
+#    xlab("Format")
+#g
+#```
+#
+#```{r,cache=T}
+#matrix_by_inst <- as.matrix(datar[,-c(1,2)])
+#rownames(matrix_by_inst) <- datar[,1][[1]]
+#cluster_inst <- hclust(dist(scale(matrix_by_inst))) 
+#matrix_by_media <- t(as.matrix(datar[,-c(1,2)]))
+#cluster_media <- hclust(dist(scale(matrix_by_media)))
+#```
+### Magnetic Media Collections by Region and Climate
+#
+#This chart will replace the original PCA charts. Instead, we will focus on the
+#variability of institutions collections considering their geographic region,
+#the region's climate properties (e.g. humidity, temp, etc.), and the reported
+#environmental conditions of the archive itself. We might consider the quantity
+#of each format according to region, but not sure how that will work or what
+#results that will give us. 
+#
+#
+#
+#```{r,fig.height=9,fig.width=9,cache=T}
+#
+#heatmap_datar <- datar[complete.cases(datar[,-c(1,2)]),]
+#
+#valz <- log10(unlist(heatmap_datar[,-c(1,2)])+1)
 #
 #col_ann <- data.frame(Format=rownames(matrix_by_media)[cluster_media$order]) %>%
 #    left_join(totals_and_risks,by="Format") %>% select(-variable) %>%
@@ -288,80 +278,127 @@ dev.off()
 #    select(-`Total Items`)
 #rownames(col_ann) <- col_ann[[1]]
 #col_ann <- col_ann %>% select(-Format)
-#count_palette <- c("#FFFFFF",
-#    colorRampPalette((RColorBrewer::brewer.pal(n=7,name="YlGnBu")))(99)
-#    )
 #
-#g <- pheatmap( log10(heatmap_datar[,-c(1,2)]+400),
-#    color=count_palette,
-#    correlation_distance_rows="pearson",
-#    correlation_distance_cols="pearson",
-#    legend_breaks=log10(c(10,100,1000,3000,1e4,2.5e4,5e4)),
-#    legend_labels=c(10,100,1000,3000,1e4,2.5e4,5e4),
-#    cluster_rows=cluster_inst,
-#    cluster_cols=cluster_media,
-#    show_rownames=F,show_colnames=T,
-#    #annotation_row=row_ann,
-#    annotation_col=col_ann,
-#    annotation_legend=T)
+#risk_annotation <- HeatmapAnnotation(
+#    `Format Risk`=col_ann$`Format Risk`,
+#    col=list(`Format Risk`=c(
+#            `Extremely High`="#7b3294",`Very High`="#c2a5cf",
+#            `High`="#a6dba0",`Moderate`="#008837"
+#    )   )   )
+#the_heatmap <- Heatmap(
+#    log10(heatmap_datar[,-c(1,2)]+1),
+#    top_annotation=risk_annotation,
+#    col=colorRamp2(
+#        c(min(valz),median(valz),max(valz)),
+#        c("#ffffff", "#fefefe", "#000000")
+#        ),
+#    heatmap_legend_param = list(
+#        title="Item counts", 
+#        at=log10(c(10+1,1000+1,1e4+1,5e4+1)),
+#        labels=c(10,1000,1e4,5e4),
+#        legend_height = unit(6, "cm"),
+#        heatmap_legend_side="bottom"
+#        )
+#    )
+#ht_list <- the_heatmap 
+#g <- draw(ht_list, heatmap_legend_side = "right", annotation_legend_side = "right")
 #g
-```
+#
+#png("heatmap.png")
+#g
+#dev.off()
+#```
+#
+#
+#```{r pheatmap,echo=F,eval=F}
+##library(pheatmap)
+##row_ann <- data.frame(
+##    Collection=str_c("C_",as.character(rownames(matrix_by_inst)[cluster_inst$order]))
+##    )
+##rownames(row_ann) <- as.character(row_ann[[1]])
+##
+##col_ann <- data.frame(Format=rownames(matrix_by_media)[cluster_media$order]) %>%
+##    left_join(totals_and_risks,by="Format") %>% select(-variable) %>%
+##    rename(`Total Items`=Total,`Format Risk`=Risk) %>%
+##    select(-`Total Items`)
+##rownames(col_ann) <- col_ann[[1]]
+##col_ann <- col_ann %>% select(-Format)
+##count_palette <- c("#FFFFFF",
+##    colorRampPalette((RColorBrewer::brewer.pal(n=7,name="YlGnBu")))(99)
+##    )
+##
+##g <- pheatmap( log10(heatmap_datar[,-c(1,2)]+400),
+##    color=count_palette,
+##    correlation_distance_rows="pearson",
+##    correlation_distance_cols="pearson",
+##    legend_breaks=log10(c(10,100,1000,3000,1e4,2.5e4,5e4)),
+##    legend_labels=c(10,100,1000,3000,1e4,2.5e4,5e4),
+##    cluster_rows=cluster_inst,
+##    cluster_cols=cluster_media,
+##    show_rownames=F,show_colnames=T,
+##    #annotation_row=row_ann,
+##    annotation_col=col_ann,
+##    annotation_legend=T)
+##g
+#```
+#
+### Final Overview Heat Map
+#
+#
+#This heat map illustrates an aggregation of the above charts and graphs. The
+#hierarchical clustering shows how each format is related or unrelated
+#considering the factors of obsolesence risk and quantity held within
+#participating archives' collections. At the top of the chart, there are two
+#major goups: (1) VHS, open reel audio, and compact cassettes, and (2) all other
+#formats. This distinction is from the quantity that instutions hold, in that
+#group 1 is more likely to have a higher quantity than group 2. From quantity
+#and risk factor, there is a noticeable relationship with Betacam and u-matic.
+#This suggests that if an archive carries of one of these format types, they are
+#likely to also have the latter in their collection. This further leads to the
+#idea that training or programming for Betacam and U-matic together could be an
+#efficient approach to dealing with those collections.
+#
+#
+#
+## Supplemental
+#
+### PCA of media format
+#
+#What major patterns of variation amongst formats are seen, with respect to their
+#inventory in different institutions?
+#
+#```{r pca_media,cache=T}
+#pca_media <- prcomp(t(matrix_by_media[apply(matrix_by_media,1,sum)>0,]),center=T,scale=T)
+#
+#media_pca_plot <- pca_media$rotation %>% 
+#    {bind_cols(tibble(Format=rownames(.)),as.tibble(.))} %>%
+#    select(Format,PC1,PC2,PC3,PC4,PC5,PC6) %>% 
+#    ggplot()+theme_bw()+
+#    aes(label=Format)+
+#    geom_label_repel()
+#media_pca_plot + aes(x=PC1,y=PC2)
+#media_pca_plot + aes(x=PC3,y=PC4)
+#media_pca_plot + aes(x=PC5,y=PC6)
+#```
+#
+### PCA of media format
+#
+#What major patterns of variation amongst formats are seen, with respect to their
+#inventory in different institutions?
+#
+#```{r pca_inst,cache=T}
+#pca_inst <- prcomp(t(matrix_by_inst[apply(matrix_by_inst,1,sum)>0,] ),center=T,scale=T)
+#
+#inst_pca_plot <- pca_inst$rotation %>% 
+#    {bind_cols(tibble(Format=rownames(.)),as.tibble(.))} %>%
+#    select(Format,PC1,PC2,PC3,PC4,PC5,PC6) %>% 
+#    ggplot()+theme_bw()+
+#    aes(label=Format)+
+#    geom_label_repel()
+#inst_pca_plot + aes(x=PC1,y=PC2)
+#inst_pca_plot + aes(x=PC3,y=PC4)
+#inst_pca_plot + aes(x=PC5,y=PC6)
+#```
 
-## Final Overview Heat Map
-
-
-This heat map illustrates an aggregation of the above charts and graphs. The
-hierarchical clustering shows how each format is related or unrelated
-considering the factors of obsolesence risk and quantity held within
-participating archives' collections. At the top of the chart, there are two
-major goups: (1) VHS, open reel audio, and compact cassettes, and (2) all other
-formats. This distinction is from the quantity that instutions hold, in that
-group 1 is more likely to have a higher quantity than group 2. From quantity
-and risk factor, there is a noticeable relationship with Betacam and u-matic.
-This suggests that if an archive carries of one of these format types, they are
-likely to also have the latter in their collection. This further leads to the
-idea that training or programming for Betacam and U-matic together could be an
-efficient approach to dealing with those collections.
-
-
-
-# Supplemental
-
-## PCA of media format
-
-What major patterns of variation amongst formats are seen, with respect to their
-inventory in different institutions?
-
-```{r pca_media,cache=T}
-pca_media <- prcomp(t(matrix_by_media[apply(matrix_by_media,1,sum)>0,]),center=T,scale=T)
-
-media_pca_plot <- pca_media$rotation %>% 
-    {bind_cols(tibble(Format=rownames(.)),as.tibble(.))} %>%
-    select(Format,PC1,PC2,PC3,PC4,PC5,PC6) %>% 
-    ggplot()+theme_bw()+
-    aes(label=Format)+
-    geom_label_repel()
-media_pca_plot + aes(x=PC1,y=PC2)
-media_pca_plot + aes(x=PC3,y=PC4)
-media_pca_plot + aes(x=PC5,y=PC6)
-```
-
-## PCA of media format
-
-What major patterns of variation amongst formats are seen, with respect to their
-inventory in different institutions?
-
-```{r pca_inst,cache=T}
-pca_inst <- prcomp(t(matrix_by_inst[apply(matrix_by_inst,1,sum)>0,] ),center=T,scale=T)
-
-inst_pca_plot <- pca_inst$rotation %>% 
-    {bind_cols(tibble(Format=rownames(.)),as.tibble(.))} %>%
-    select(Format,PC1,PC2,PC3,PC4,PC5,PC6) %>% 
-    ggplot()+theme_bw()+
-    aes(label=Format)+
-    geom_label_repel()
-inst_pca_plot + aes(x=PC1,y=PC2)
-inst_pca_plot + aes(x=PC3,y=PC4)
-inst_pca_plot + aes(x=PC5,y=PC6)
 ```
 
