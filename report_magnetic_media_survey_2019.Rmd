@@ -83,8 +83,8 @@ knitr::opts_chunk$set(echo=F,message=F,error=T)
 	November 21, 2018—a total of two full weeks. Throughout the two weeks in which the
 	survey was open, individual and institutional reference emails were messaged for
 	continual outreach. Once the questionnaire closed, data was cleaned and processed
-	using OpenRefine and Google Sheets. Further data analysis was conducted using R 
-	after initial findings warranted further analysis.
+	using OpenRefine and Google Sheets. R was used to create visualizations and
+	additional data analysis after initial findings warranted a deeper evaluation.
 
 # Results
 
