@@ -50,6 +50,42 @@ knitr::opts_chunk$set(echo=F,message=F,error=T)
 
 # Methods
 
+    This study involved mixed methodologies to answering the research question:
+	*What is the preservation status of magnetic media collections in academic* 
+	*libraries and archives, and to what degree are they endangered by degradation*
+	*and obsolescence?* From a questionnaire fulfilled by a sample of academic
+	libraries, quantitative data was gathered on collection size, format composition,
+	and digitization percentage to evaluate the current state of magnetic media
+	collections. Along with quantitative data, qualitative data was collected through
+	interviews on preservation management strategies to evaluate institutions’
+	responses to the magnetic media crisis.
+	
+	The questionnaire was the primary data collection tool. Most, if not all,
+	academic institutions maintain records of the items within their collections,
+	and more often than not, they also track the formats of those items.
+	If an institution does not track this sort of data, it is an indication that
+	the institution does not have a comprehensive preservation management plan
+	prepared to properly address the magnetic media crisis. 
+	
+	The first portion of the questionnaire asked for numerical values pertaining to
+	the amount and breakdown of magnetic media the institution holds as well as the
+	number of content hours that magnetic media contains. The second portion of the
+	questionnaire asked the institution about current preservation management
+	strategies in place, and how prepared they felt they were to deal with the
+	degradation and obsolescence of magnetic media.
+	
+	The survey was created and hosted through the online platform SurveyMonkey and
+	disseminated through various electronic channels. These included SAA, ALA, and
+	AMIA listservs, Twitter, and emails sent to individual contacts. Email messages 
+	were adapted depending on the profession/personal relationships the researchers
+	had with the individual librarians and archivists. The questionnaire was initially
+	circulated to all listservs on the night of November 7th and closed on
+	November 21, 2018—a total of two full weeks. Throughout the two weeks in which the
+	survey was open, individual and institutional reference emails were messaged for
+	continual outreach. Once the questionnaire closed, data was cleaned and processed
+	using OpenRefine and Google Sheets. Further data analysis was conducted using R 
+	after initial findings warranted further analysis.
+
 # Results
 
 ```{r load_libraries,cache=T}
