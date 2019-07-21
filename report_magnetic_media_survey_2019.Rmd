@@ -26,14 +26,14 @@ abstract: |
     that against actual digitization rates left more magnetic items 
     undigitized. The data also displayed visible trend lines between carrier 
     type risk-level and the institutions holding similar quantities of each 
-    format type. This could help with the challenge of the medium’s limited 
-    lifespan as digitization hubs can be concentrated near those institutions 
-    with similar format types. In a race against the clock, archives are 
-    limited by funds and time as they attempt to preserve valuable media 
-    before it degrades into unreadability. Data from this study will offer 
-    numbers to support institutions and archivists to obtain funding and 
-    prepare for the digitization to preservation processes before twenty years 
-    pass and the magnetic media content is just a sticky memory.
+    format type. These patterns have the potential to assist with the challenge
+	of the medium’s limited lifespan as digitization hubs can be concentrated
+	near those institutions with similar format types. In a race against the 
+	clock, archives are limited by funds and time as they attempt to preserve 
+	valuable media before it degrades into unreadability. Data from this study
+	will offer numbers to support institutions and archivists to obtain funding
+	and prepare for the digitization to preservation processes before twenty 
+	years pass and the magnetic media content is just a sticky memory.
 ---
 
 ```{r set_global_knit_options,echo=F,message=F,error=T}
