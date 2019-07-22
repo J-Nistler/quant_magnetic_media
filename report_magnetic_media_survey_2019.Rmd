@@ -11,29 +11,31 @@ tags:
     - magnetic media
     - audio/visual media
 abstract: |
-    This is a quantitative study on the status of magnetic media collections. 
+    This is a quantitative study on the status of magnetic media collections.
     Data collected from forty-nine archive institutions, across the United 
     States and Canada, reveals the degree institutions are at risk in losing 
     historical and cultural magnetic records due to the lack of bandwidth in 
     digitizing collections, substandard environmental conditions, and the rapid
     deterioration rate of magnetic carriers. From a ten-question survey, data 
-    reflected archivists managing magnetic media collections are not confident
+    reflects archivists managing magnetic media collections are not confident
     in their assessments of the once-ubiquitous materials. Numbers reveal 
     cognitive dissonance from clear discrepancies between quantities of format
     type compared to archivists’ self-reflection on preservation practice and 
     estimated digitization rates before obsolescence. The majority expressed 
     confidence in digitizing 75% or more of their collection, but calculating 
     that against actual digitization rates left more magnetic items 
-    undigitized. The data also displayed visible trend lines between carrier 
+    undigitized. The data also displays visible trend lines between carrier 
     type risk-level and the institutions holding similar quantities of each 
     format type. These patterns have the potential to assist with the challenge 
-    of the medium’s limited lifespan as digitization hubs can be concentrated 
-    near those institutions with similar format types. In a race against the 
-    clock, archives are limited by funds and time as they attempt to preserve 
+    of the medium’s limited lifespan as digitization and training hubs can be 
+    concentrated near those institutions with similar format types. In a race against    
+    the clock, archives are limited by funds and time as they attempt to preserve 
     valuable media before it degrades into unreadability. Data from this study
     will offer numbers to support institutions and archivists to obtain funding
     and prepare for the digitization to preservation processes before twenty 
-    years pass and the magnetic media content is just a sticky memory.
+    years pass and the magnetic media content is just a sticky memory. Read the rest 
+    of this poster and/or visit our GitHub repository for reproducible data and more 
+    details: [https://github.com/darachm/magnets_how_do_they_work](https://github.com/darachm/magnets_how_do_they_work).
 ---
 
 ```{r set_global_knit_options,echo=F,message=F,error=T}
@@ -77,14 +79,20 @@ knitr::opts_chunk$set(echo=F,message=F,error=T)
 	The survey was created and hosted through the online platform SurveyMonkey and
 	disseminated through various electronic channels. These included SAA, ALA, and
 	AMIA listservs, Twitter, and emails sent to individual contacts. Email messages 
-	were adapted depending on the profession/personal relationships the researchers
-	had with the individual librarians and archivists. The questionnaire was initially
-	circulated to all listservs on the night of November 7th and closed on
-	November 21, 2018—a total of two full weeks. Throughout the two weeks in which the
-	survey was open, individual and institutional reference emails were messaged for
-	continual outreach. Once the questionnaire closed, data was cleaned and processed
-	using OpenRefine and Google Sheets. R was used to create visualizations and
-	additional data analysis after initial findings warranted a deeper evaluation.
+	were adapted depending on the profession/personal relationships we had with the 
+	individual librarians and archivists. The questionnaire was initially circulated 
+	to all listservs on the night of November 7th and closed on November 21, 2018—a 
+	total of two full weeks. Throughout the two weeks in which the survey was open, 
+	individual and institutional reference emails were messaged for continual outreach. 
+	Once the questionnaire closed, data was cleaned and processed using OpenRefine and 
+	Google Sheets. R was used to create visualizations and additional data analysis after 
+	initial findings warranted a deeper evaluation.
+
+# Response
+- 9 of the 49 survey participants were comfortable in report accurate numbers when asked how many items held in their collections. This is problematic because the first step to preservation is evaluation (Paton 1998).
+- 39 respondents represented an academic library
+- 100% VHS & S-VHS in their collection was reported by one institution
+- 1,551,273 total magnetic media items were reported to the questionnaire
 
 # Results
 
@@ -534,3 +542,14 @@ total collection.
 
 ```
 
+# Conclusions
+
+While the data comes from a limited pool of academic archives and therefore cannot speak for all archives, the data can still serve to indicate what may be expected. Additional research addressing the preservation status of magnetic media collections in academic libraries, and to what degree are they endangered, could only make a stronger case for funding proposals. However, even without further research, it is imperative to report that archivists must begin by conducting assessments and evaluations of their collections in order to allocate resources to digitize their magnetic media collections. This is a crucial first step that needs to happen now, not later during the institution’s five-year plan. Moreover, this study illustrates that many institutions have not taken this first step.
+
+# Future Opportunities
+
+# References
+
+# Acknowledgements
+
+Many thanks to: our LIS 570 collaborators, Brian Click and Michael Kuster, who helped with the literature review, method design, and co-writing the original paper. Paul J. Weiss, LIS 570 instructor, who inspired and guided us to use this project to engage and contribute to the larger archives community. All survey respondents, interviewees, and archive listervs who welcomed our research to the discussion forums. Thank you SAA for accepted our research to the graduate student poster presentation. 
