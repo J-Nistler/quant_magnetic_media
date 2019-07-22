@@ -114,7 +114,7 @@ raw_datar <- read_csv("survey_data_2019.csv",
     skip=1
     )
 
-reasonable_responses <- filter(raw_datar,!is.na(InstitutionType)) 
+reasonable_responses <- raw_datar
 
 responses_with_totals <- distinct(
         filter(reasonable_responses,!is.na(reasonable_responses$TotalItems))
@@ -126,6 +126,12 @@ risk_factors <- read_tsv("risk_assesment.tsv") %>%
         )   ) %>%
     {setNames(.$Risk,.$Format)}
 ```
+
+```{r}
+responses_with_totals
+reasonable_responses[!(reasonable_responses$Key %in% responses_with_totals$Key),]
+```
+
 
 We received ``r nrow(reasonable_responses)`` responses. The survey asked for
 estimates of proportion of the collection that is in each format and an 
