@@ -104,12 +104,13 @@ library(circlize)
 ```
 
 ```{r read_data_risks,cache=T}
-raw_datar <- read_csv("survey_data_2019.csv",
+raw_datar <- read_csv("survey_data_2019.csv" ,
     col_names=c(
         "Key","State","InstitutionType","TotalItems",
         "StorageConditions",
         "Unstructured_StorageHistory",
         "Unstructured_CompletionEstimate",
+        "PercentDigitizedBeforeUnplayable",
         "PracticeSelfAssesment",
         "Percentage_Open_Reel_Video","Percentage_U-Matic","Percentage_Betamax",
         "Percentage_VHS_&_S-VHS","Percentage_Betacam_&_Betacam_SP",
@@ -120,13 +121,12 @@ raw_datar <- read_csv("survey_data_2019.csv",
         "Percentage_DAT","Percentage_DTRS","Percentage_F-1","Percentage_DCC",
         "Percentage_8-Track","Percentage_Other"),
     skip=1
-    )
-
-reasonable_responses <- raw_datar
-
-responses_with_totals <- distinct(
-        filter(reasonable_responses,!is.na(reasonable_responses$TotalItems))
+    ) %>%
+    mutate(PercentDigitizedBeforeUnplayable=sub("%","",
+            PercentDigitizedBeforeUnplayable)
         )
+
+all_responses <- raw_datar
 
 risk_factors <- read_tsv("risk_assesment.tsv") %>%
     mutate(Risk=factor(Risk,
@@ -135,23 +135,14 @@ risk_factors <- read_tsv("risk_assesment.tsv") %>%
     {setNames(.$Risk,.$Format)}
 ```
 
-```{r}
-responses_with_totals
-reasonable_responses[!(reasonable_responses$Key %in% responses_with_totals$Key),]
-```
 
-
-We received ``r nrow(reasonable_responses)`` responses. The survey asked for
-estimates of proportion of the collection that is in each format and an 
-estimate of the total collection size.
-``r nrow(reasonable_responses)-nrow(responses_with_totals)`` responses
-lacked estimates of total collection size.
+We received ``r nrow(all_responses)`` responses. 
 
 
 ## Respondents by Institution Types
 
 ```{r responses_by_instutition_type,cache=T}
-reasonable_responses %>%
+all_responses %>%
     {
     ggplot(.)+theme_bw()+
     aes(x=InstitutionType)+
@@ -171,7 +162,7 @@ Despite a chunk of participants being non-academic libraries, the
 research scope did not change and data from these other institutions are not
 included in the final analysis. 
 
-``r sum(reasonable_responses$InstitutionType!="Academic")``
+``r sum(all_responses$InstitutionType!="Academic")``
 of these are not "Academic"
 
 Shouldn't we include all of these? What's the difference?
@@ -184,10 +175,10 @@ research.
 ## Distribution of Institution Facilities Environmental Conditions
 
 
-``r sum(is.na(reasonable_responses$StorageConditions))`` didn't respond
+``r sum(is.na(all_responses$StorageConditions))`` didn't respond
 
 ```{r responses_by_storage_conditions,cache=T,fig.height=7}
-reasonable_responses %>%
+all_responses %>%
     filter(!is.na(StorageConditions)) %>%
     {
     ggplot(.)+theme_bw()+
@@ -232,7 +223,7 @@ investment into A/V digitization practices.
 
 
 ```{r responses_by_self_reflection,cache=T,fig.height=7}
-reasonable_responses %>%
+all_responses %>%
     filter(!is.na(PracticeSelfAssesment)) %>%
     {
     ggplot(.)+theme_bw()+
@@ -256,7 +247,7 @@ reasonable_responses %>%
 Let's compare them.
 
 ```{r responses_self_versus_storage,cache=T,fig.height=5}
-reasonable_responses %>%
+all_responses %>%
     filter(!is.na(PracticeSelfAssesment)) %>%
     filter(!is.na(StorageConditions)) %>%
     {
