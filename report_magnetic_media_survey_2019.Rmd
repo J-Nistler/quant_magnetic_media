@@ -39,7 +39,7 @@ abstract: |
 ---
 
 ```{r set_global_knit_options,echo=F,message=F,error=T}
-knitr::opts_chunk$set(echo=F,message=F,error=T)
+knitr::opts_chunk$set(echo=F,message=F,error=T,warning=F)
 ```
 
 
@@ -117,12 +117,12 @@ raw_datar <- read_csv("survey_data_2019.csv" ,
         "Unstructured_CompletionEstimate",
         "PercentDigitizedBeforeUnplayable",
         "PracticeSelfAssesment",
-        "Percentage_Open_Reel_Video","Percentage_U-Matic","Percentage_Betamax",
-        "Percentage_VHS_&_S-VHS","Percentage_Betacam_&_Betacam_SP",
-        "Percentage_Video_8_&_Hi8","Percentage_D2","Percentage_D3",
+        "Percentage_Open Reel Video","Percentage_U-Matic","Percentage_Betamax",
+        "Percentage_VHS & S-VHS","Percentage_Betacam & Betacam SP",
+        "Percentage_Video 8 & Hi8","Percentage_D2","Percentage_D3",
         "Percentage_DVCAM","Percentage_MiniDV","Percentage_DVCPro",
-        "Percentage_Digital_8","Percentage_Open_Reel_Audio",
-        "Percentage_Compact_Cassette","Percentage_Microcassette",
+        "Percentage_Digital 8","Percentage_Open Reel Audio",
+        "Percentage_Compact Cassette","Percentage_Microcassette",
         "Percentage_DAT","Percentage_DTRS","Percentage_F-1","Percentage_DCC",
         "Percentage_8-Track","Percentage_Other"),
     skip=1
@@ -130,14 +130,20 @@ raw_datar <- read_csv("survey_data_2019.csv" ,
     mutate(PercentDigitizedBeforeUnplayable=sub("%","",
             PercentDigitizedBeforeUnplayable)
         )
-
 all_responses <- raw_datar
 
 risk_factors <- read_tsv("risk_assesment.tsv") %>%
     mutate(Risk=factor(Risk,
             levels=c("Low","Moderate","High","Very High","Extremely High")
-        )   ) %>%
-    {setNames(.$Risk,.$Format)}
+        )   ) 
+
+tdatar <- all_responses %>%
+    gather(Format,Percentage,starts_with("Percentage_")) %>%
+    mutate(Percentage=as.numeric(sub("%","",Percentage))) %>%
+    mutate(EstItemCount=TotalItems*Percentage/100) %>%
+    mutate(FormatName=sub("Percentage_","",Format)) %>% 
+    left_join(risk_factors%>%rename(FormatName=Format),by="FormatName")
+
 ```
 
 
@@ -340,66 +346,67 @@ all_responses %>%
     }
 ```
 
+## Totals of format type and their obsolescence risk factor (JN)
 
+```{r format_counts_divided_x_by_risk,cache=T,fig.height=7}
+tdatar %>% 
+    ggplot()+theme_bw()+
+    aes(x=Risk,group=FormatName,weight=EstItemCount,label=FormatName)+
+    geom_point(stat="count")+
+    geom_label_repel(stat="count")+
+    theme(axis.text.x=element_text(angle=90))+
+    ylab("Total estimated items across survey")+
+    xlab("Risk Estimate")
+```
+
+## Estimated Number of Each Format
+
+```{r total_numbers_of_items_each_format_dist,cache=T}
+tdatar %>% 
+    {
+    ggplot(.)+theme_bw()+
+    aes(x=FormatName,y=EstItemCount)+
+    geom_boxplot(outlier.alpha=0)+
+    geom_dotplot(binaxis="y",stackdir="center",dotsize=1.0,alpha=0.5,binwidth=0.05)+
+    scale_y_log10()+
+    scale_x_discrete(limits=group_by(.,FormatName)%>%summarize(z=sum(EstItemCount,na.rm=T))%>%arrange(-z)%>%pull(FormatName))+
+    theme(axis.text.x=element_text(angle=90))+
+    ylab("Total estimated items across survey")+
+    xlab("Format")
+    }
+```
+
+
+This box plot mirrors what we've seen in that there are noticeable high
+quantities of VHS and open reel audio, but this makes it more apparent where
+there are instituions holding an skewed amount of a format type within their
+collection. It's clear that there are a lot of data points in VHS. Nearly all
+participating institutions have at least one VHS tape. On the other hand, there
+are only about four or five archives that need to deal with Digital 8.
+
+
+Notice this one is cropping out one observation of a fraction of a fraction of
+a percentage of "Other" media.
+```{r percentage_of_collections_that_are_each_format,cache=T}
+# Notice this one is cropping out one observation of a fraction of a fraction of
+# a percentage of "Other" media.
+tdatar %>% 
+    {
+    ggplot(.)+theme_bw()+
+    aes(x=FormatName,y=Percentage)+
+    geom_boxplot(outlier.alpha=0)+
+    geom_dotplot(binaxis="y",stackdir="center",dotsize=1.0,alpha=0.5,binwidth=0.05)+
+    scale_y_log10(limits=c(1,NA))+
+    scale_x_discrete(limits=group_by(.,FormatName)%>%summarize(z=sum(Percentage,na.rm=T))%>%arrange(-z)%>%pull(FormatName))+
+    theme(axis.text.x=element_text(angle=90))+
+    ylab("Percentage of collection that is that item")+
+    xlab("Format")
+    }
+```
 
 
 
 ```{r}
-
-#
-### Totals of format type and their obsolescence risk factor (JN)
-#
-#```{r,cache=T}
-#totals_and_risks <- pdatar %>% filter(variable!="Total Items") %>%
-#    group_by(variable) %>% summarize(Total=sum(value,na.rm=T)) %>%
-#    arrange(Total) %>%
-#    mutate(Format=factor(variable,levels=variable)) %>%
-#    left_join(risk_factors,by="Format") %>%
-#    select(-Quantity)
-#
-#totals_and_risks
-#```
-#
-#```{r,fig.height=9,fig.width=9,cache=T}
-#g<- totals_and_risks%>%
-#    filter(Total>0,!is.na(Risk))%>%
-#    ggplot()+theme_bw()+
-#    aes(x=Risk,y=Total)+
-#    theme(axis.text.x=element_text(angle=90))+
-#    geom_label_repel(aes(label=Format))+
-#    ylab("Total items across survey")+
-#    xlab("")+
-#    ggtitle("Total counts of high risk magnetic media")
-#g
-#```
-#
-### Estimated Number of Each Format
-#
-#```{r,fig.height=5,fig.width=7,cache=T}
-#g <- pdatar %>%
-#    mutate(variable=factor(variable,levels=arrange(totals_and_risks,-Total)$Format)) %>%
-#    filter(variable!="Total Items")%>%
-#    filter(value>0)%>%
-#    ggplot()+theme_bw()+
-#    geom_boxplot(outlier.alpha=0)+
-#    geom_dotplot(binaxis="y",stackdir="center",dotsize=1.0,alpha=0.5,binwidth=0.05)+
-#    aes(x=variable,y=value)+
-#    scale_y_log10(breaks=c(10,100,1000,10000,1000000))+
-#    theme(axis.text.x=element_text(angle=90))+
-#    ylab("Estimated number of items in collection of that format")+
-#    xlab("Format")
-#g
-#```
-#
-#This box plot mirrors what we've seen in that there are noticeable high
-#quantities of VHS and open reel audio, but this makes it more apparent where
-#there are instituions holding an skewed amount of a format type within their
-#collection. It's clear that there are a lot of data points in VHS. Nearly all
-#participating institutions have at least one VHS tape. On the other hand, there
-#are only about four or five archives that need to deal with Digital 8.
-#
-#
-#
 #
 #```{r,fig.height=5,fig.width=7,cache=T}
 #g <- pdatar %>%
