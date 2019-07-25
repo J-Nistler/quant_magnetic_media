@@ -185,7 +185,7 @@ research.
 
 ## Distribution of Institution Facilities Environmental Conditions
 
-
+** INCLUDE WITH ANOTHER GRAPH **
 ``r sum(is.na(all_responses$StorageConditions))`` didn't respond
 
 ```{r responses_by_storage_conditions,cache=T,fig.height=7}
@@ -293,7 +293,9 @@ point types in R
 http://www.sthda.com/english/wiki/r-plot-pch-symbols-the-different-point-shapes-available-in-r
 
 
-## Institutional Estimate of the Percentage of Magnetic Media that will be Digitized before Estimated to be Unplayable
+## Institutional Estimate of the Percentage of Magnetic Media that will be Digitized before Estimated to be Unplayable And Environmental Conditions
+** POSTER-1**
+TO DO: 2 histograms side-by-side
 
 Of the thirty-six respondents who chose to estimate how much magnetic material
 they would be able to digitize, eight—nearly a quarter—were confident they
@@ -346,8 +348,8 @@ all_responses %>%
     }
 ```
 
-## Totals of format type and their obsolescence risk factor (JN)
-
+## Total itemss of each format type and their obsolescence risk factor
+** POSTER-2**
 ```{r format_counts_divided_x_by_risk,cache=T,fig.height=7}
 tdatar %>% 
     ggplot()+theme_bw()+
@@ -358,9 +360,13 @@ tdatar %>%
     ylab("Total estimated items across survey")+
     xlab("Risk Estimate")
 ```
+TO DO: no label borders and move dots to not overlap
+
+Description: Basic map of qty vs risk
+
 
 ## Estimated Number of Each Format
-
+** POSTER-3**
 ```{r total_numbers_of_items_each_format_dist,cache=T}
 tdatar %>% 
     {
@@ -376,7 +382,6 @@ tdatar %>%
     }
 ```
 
-
 This box plot mirrors what we've seen in that there are noticeable high
 quantities of VHS and open reel audio, but this makes it more apparent where
 there are instituions holding an skewed amount of a format type within their
@@ -384,7 +389,9 @@ collection. It's clear that there are a lot of data points in VHS. Nearly all
 participating institutions have at least one VHS tape. On the other hand, there
 are only about four or five archives that need to deal with Digital 8.
 
+These are calculatinos based on the percentages given and the absolute total of instiutions' collections shared.
 
+**DELET BELOW**
 Notice this one is cropping out one observation of a fraction of a fraction of
 a percentage of "Other" media.
 ```{r percentage_of_collections_that_are_each_format,cache=T}
@@ -406,22 +413,21 @@ tdatar %>%
 
 
 ## Magnetic Media Collections by Region and Climate
+** POSTER-4**
 
-This chart will replace the original PCA charts. Instead, we will focus on the
-variability of institutions collections considering their geographic region,
-the region's climate properties (e.g. humidity, temp, etc.), and the reported
-environmental conditions of the archive itself. We might consider the quantity
-of each format according to region, but not sure how that will work or what
+Instead, we will focus on the variability of institutions collections considering the geographic region, the region's climate properties (e.g. humidity, temp, etc.), and the reported environmental conditions of the archive itself. We might consider the quantity of each format according to region, but not sure how that will work or what
 results that will give us. 
 
-#Do you have a map of what `State` maps to what reigon?
+label = # of institutions responding  
+type of color = major climate risk/threat
+intensity of color = amount of total items estimated based on survey
 
-
+We received respondents from all different climates. There is a bias because certain regions/states have a lot more data. 
 
 
 ## Final Overview Heat Map
 
-
+** POSTER-5**
 This heat map illustrates an aggregation of the above charts and graphs. The
 hierarchical clustering shows how each format is related or unrelated
 considering the factors of obsolesence risk and quantity held within
@@ -434,6 +440,10 @@ This suggests that if an archive carries of one of these format types, they are
 likely to also have the latter in their collection. This further leads to the
 idea that training or programming for Betacam and U-matic together could be an
 efficient approach to dealing with those collections.
+
+TO DO:  
+* Order y-axis of instutions by estimated percent of completion
+* new color scale
 
 
 Organized by total counts of the items - how important is it overall?
@@ -474,7 +484,7 @@ ht_list <- the_heatmap
 g <- draw(ht_list, heatmap_legend_side = "right", annotation_legend_side = "right")
 ```
 
-
+** DELETE **
 Organized by fraction of the collection that is each format - 
 how important is it overall?
 ```{r heatmap_frac,cache=T,fig.height=9,fig.width=9}
@@ -558,6 +568,8 @@ cluster_media <- hclust(dist(scale(matrix_by_media)))
 
 What major patterns of variation amongst formats are seen, with respect to their
 inventory in different institutions?
+The ways in which some factors are similar to each other and then distinct to others.Groupings of how formats are distributed differently. 
+ 
 
 ```{r pca_media,cache=T}
 pca_media <- prcomp(t(matrix_by_media[apply(matrix_by_media,1,sum)>0,]),center=T,scale=T)
@@ -659,6 +671,7 @@ ggplot(rez)+theme_bw()+
 
 
 And if we replot some of those back on the PCA plots:
+Bridge the gap between institution types. Consider GLAM practices but also this shows the instittution type does hold different assets, which means different needs. 
 
 ```{r replot_pcas,cache=T}
 pc14 <- inst_pca_plot+aes(x=PC1,y=PC4,fill=as.numeric(sub("%","",Percentage_Other)))+
