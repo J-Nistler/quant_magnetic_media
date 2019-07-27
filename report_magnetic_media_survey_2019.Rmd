@@ -431,13 +431,13 @@ ggsave("risk_and_totals_log.svg",g+
 
 ggsave("risk_and_totals.png", g+
     scale_y_continuous(labels=function(x){formatC(x,big.mark=",",format="d")},
-        breaks=seq(0,2e5,2e4))+
+        breaks=seq(0,2e5,2e4),limits=c(-2e4,NA))+
         geom_dotplot(binaxis="y",stackdir="center",binwidth=3e3),
     width=6,height=6)
-ggsave("risk_and_totals.svg",g+
+ggsave("risk_and_totals.svg", g+
     scale_y_continuous(labels=function(x){formatC(x,big.mark=",",format="d")},
-        breaks=seq(0,2e5,2e4))+
-        geom_dotplot(binaxis="y",stackdir="center",binwidth=3e3),
+        breaks=seq(0,2e5,2e4),limits=c(-2e4,NA))+
+        geom_dotplot(binaxis="y",stackdir="center",binwidth=3e3) ,
     width=6,height=6)
 
 ```
@@ -483,6 +483,7 @@ These are calculatinos based on the percentages given and the absolute total of 
 
 
 ## Magnetic Media Collections by Region and Climate
+
 ** POSTER-4**
 
 Instead, we will focus on the variability of institutions collections considering the geographic region, the region's climate properties (e.g. humidity, temp, etc.), and the reported environmental conditions of the archive itself. We might consider the quantity of each format according to region, but not sure how that will work or what
@@ -515,9 +516,110 @@ TO DO:
 * Order y-axis of instutions by estimated percent of completion
 * new color scale
 
+```{r 2nd_heatmap_counts,fig.height=9,fig.width=9,cache=T}
+library(gplots)
+
+heatmap_datar_counts <- tdatar %>% 
+    filter(EstItemCount>0) %>%
+    select(Key,State,InstitutionType,TotalItems,
+        PercentDigitizedBeforeUnplayable,FormatName,EstItemCount) %>%
+    spread(FormatName,EstItemCount,fill=0) %>%
+    arrange(-as.numeric(PercentDigitizedBeforeUnplayable))
+heatmap_datar_counts%>%pull(PercentDigitizedBeforeUnplayable)
+
+counts_matrix <- as.matrix(log10(heatmap_datar_counts[,-c(1,2,3,4,5)]+1))
+
+#risk_palette <- 
+#    rev(colorRampPalette(brewer.pal(n=9,name="Spectral"))(
+#        length(levels(risk_factors$Risk))
+#    ))[
+#        tibble(Format=colnames(heatmap_datar_counts)[
+#                6:ncol(heatmap_datar_counts)]
+#            )%>%    
+#            left_join(risk_factors,by="Format")%>%pull(Risk)
+#        ] 
+
+# Thanks colorbrewer2 website!
+colorz <- setNames(c('#ffffb2','#fecc5c','#fd8d3c','#f03b20','#bd0026'),
+        levels(risk_factors$Risk))
+risk_palette <- colorz[
+        tibble(Format=colnames(heatmap_datar_counts)[
+                6:ncol(heatmap_datar_counts)]
+            )%>%    
+            left_join(risk_factors,by="Format")%>%pull(Risk)
+        ] 
+k <- data.frame(fill=colorz[levels(risk_factors$Risk)],y=levels(risk_factors$Risk)) %>%
+    ggplot()+theme_classic()+
+    aes(fill=y,x=1,y=y)+
+    scale_fill_manual("Risk",values=colorz)+
+    scale_y_discrete(limits=levels(risk_factors$Risk))+
+    guides(fill=F)+
+    geom_tile()+
+    theme(axis.text.x=element_blank(),axis.ticks=element_blank(),
+        axis.line=element_blank())+
+    ylab("")+xlab("")
+k
+ggsave("heatmap_key.png",k,width=3,height=2)
+
+tickfunc <- function() {
+            breaks <- 10^seq(1,5,0.1)
+            which_ones <- c(11,21,31,41)
+            return(list(
+                at=parent.frame()$scale01(log10(breaks[which_ones])),
+                labels=formatC(breaks[which_ones],big.mark=",",format="d")
+                ))
+           }
+
+
+svg("magnetic_heatmap_ordered_by_chance_completion_at_top.svg",width=8,height=8)
+heatmap.2(counts_matrix,
+    key.xlab="Estimated Items",
+    col=colorRampPalette(brewer.pal(n=9,name="PuBuGn"))(100),
+    ColSideColors=risk_palette,
+    margins=c(08,2),
+    labRow="",
+    srtCol=45,
+    density.info="none",
+    trace="none",
+    dendrogram="col",
+    Rowv=F,
+    reorderfun=function(d, w) rev(reorder(d, w, agglo.FUN = mean)),
+    ylab="Respondent, ordered by estimated completion",
+    key.xtickfun=tickfunc
+    )
+dev.off()
+
+svg("magnetic_heatmap_clustered_rows.svg",width=8,height=8)
+heatmap.2(counts_matrix,
+    key.xlab="Estimated Items",
+    col=colorRampPalette(brewer.pal(n=9,name="PuBuGn"))(100),
+    ColSideColors=risk_palette,
+    margins=c(08,2),
+    labRow="",
+    srtCol=45,
+    density.info="none",
+    trace="none",
+    dendrogram="both",
+    reorderfun=function(d, w) rev(reorder(d, w, agglo.FUN = mean)),
+    ylab="Respondent",
+    key.xtickfun=tickfunc
+    )
+dev.off()
+
+
+library(RColorBrewer)
+
+
+```
+
 
 Organized by total counts of the items - how important is it overall?
 ```{r heatmap_counts,fig.height=9,fig.width=9,cache=T}
+library(seriation)
+
+seriation_of_matrix <- seriate(as.matrix(log10(heatmap_datar_counts[,-c(1,2,3,4)]+1)))
+#, method = "BEA_TSP")
+
 heatmap_datar_counts <- tdatar %>% 
     filter(EstItemCount>0) %>%
     select(Key,State,InstitutionType,TotalItems,FormatName,EstItemCount) %>%
@@ -548,7 +650,9 @@ the_heatmap <- Heatmap(
         labels=c(10,1000,1e4,5e4),
         legend_height = unit(6, "cm"),
         heatmap_legend_side="bottom"
-        )
+        ),
+    row_order=get_order(seriation_of_matrix,1),
+    column_order=get_order(seriation_of_matrix,2)
     )
 ht_list <- the_heatmap 
 g <- draw(ht_list, heatmap_legend_side = "right", annotation_legend_side = "right")
