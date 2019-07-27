@@ -411,7 +411,9 @@ g <- tdatar %>%
     ylab("Total estimated items, across survey")+
     xlab("Risk Estimate")
 g
+
 g+geom_dotplot(binaxis="y",stackdir="center",binwidth=3e3)
+
 g+geom_dotplot(binaxis="y",stackdir="center",binwidth=0.05)+
     scale_y_log10(labels=function(x){formatC(x,big.mark=",",format="d")},
         breaks=c(500+0.5,1e3,2e3,5e3+0.5,1e4,2e4,5e4+1,1e5,2e5))
@@ -440,23 +442,33 @@ ggsave("risk_and_totals.svg",g+
 
 ```
 
-
-
 ## Estimated Number of Each Format
+
 **POSTER-3**
+
 ```{r total_numbers_of_items_each_format_dist,cache=T}
-tdatar %>% 
+
+g <- tdatar %>% 
     {
-    ggplot(.)+theme_bw()+
+    ggplot(.)+
+    theme_bw()+
     aes(x=FormatName,y=EstItemCount)+
-    geom_boxplot(outlier.alpha=0)+
-    geom_dotplot(binaxis="y",stackdir="center",dotsize=1.0,alpha=0.5,binwidth=0.05)+
-    scale_y_log10()+
-    scale_x_discrete(limits=group_by(.,FormatName)%>%summarize(z=sum(EstItemCount,na.rm=T))%>%arrange(-z)%>%pull(FormatName))+
+    geom_boxplot(outlier.alpha=0,color="grey50")+
+    geom_dotplot(binaxis="y",stackdir="center",dotsize=1.0,alpha=1.0,binwidth=0.05)+
+    scale_y_log10(labels=function(x){formatC(x,big.mark=",",format="d")})+
+    scale_x_discrete(
+        limits=group_by(.,FormatName)%>%
+            summarize(z=sum(EstItemCount,na.rm=T))%>%
+            arrange(-z)%>%pull(FormatName)
+        )+
     theme(axis.text.x=element_text(angle=90))+
-    ylab("Total estimated items across survey")+
-    xlab("Format")
+    ylab("Each respondent's estimated items per format")+
+    xlab("")
     }
+g
+ggsave("items_per_respondent.png",g,width=8,height=6)
+ggsave("items_per_respondent.svg",g,width=8,height=6)
+
 ```
 
 This box plot mirrors what we've seen in that there are noticeable high
@@ -468,25 +480,6 @@ are only about four or five archives that need to deal with Digital 8.
 
 These are calculatinos based on the percentages given and the absolute total of instiutions' collections shared.
 
-**DELET BELOW**
-Notice this one is cropping out one observation of a fraction of a fraction of
-a percentage of "Other" media.
-```{r percentage_of_collections_that_are_each_format,cache=T}
-# Notice this one is cropping out one observation of a fraction of a fraction of
-# a percentage of "Other" media.
-tdatar %>% 
-    {
-    ggplot(.)+theme_bw()+
-    aes(x=FormatName,y=Percentage)+
-    geom_boxplot(outlier.alpha=0)+
-    geom_dotplot(binaxis="y",stackdir="center",dotsize=1.0,alpha=0.5,binwidth=0.05)+
-    scale_y_log10(limits=c(1,NA))+
-    scale_x_discrete(limits=group_by(.,FormatName)%>%summarize(z=sum(Percentage,na.rm=T))%>%arrange(-z)%>%pull(FormatName))+
-    theme(axis.text.x=element_text(angle=90))+
-    ylab("Percentage of collection that is that item")+
-    xlab("Format")
-    }
-```
 
 
 ## Magnetic Media Collections by Region and Climate
