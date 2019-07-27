@@ -104,6 +104,7 @@ initial findings warranted a deeper evaluation.
 ```{r load_libraries}
 library(tidyverse)
 library(ggrepel)
+library(egg)
 library(ComplexHeatmap)
 library(circlize)
 ```
@@ -294,8 +295,6 @@ http://www.sthda.com/english/wiki/r-plot-pch-symbols-the-different-point-shapes-
 
 
 ## Institutional Estimate of the Percentage of Magnetic Media that will be Digitized before Estimated to be Unplayable And Environmental Conditions
-** POSTER-1**
-TO DO: 2 histograms side-by-side
 
 Of the thirty-six respondents who chose to estimate how much magnetic material
 they would be able to digitize, eight—nearly a quarter—were confident they
@@ -324,49 +323,127 @@ all_responses %>%
     }
 ```
 
-```{r responses_self_versus_completion,cache=T}
-all_responses %>%
-    filter(!is.na(PracticeSelfAssesment)) %>%
+**POSTER-1**
+TO DO: 2 histograms side-by-side
+```{r storage_conditions_and_completion,cache=T,fig.height=7}
+g_storage_vs_complete <- all_responses %>%
+    filter(!is.na(StorageConditions)) %>%
     filter(!is.na(PercentDigitizedBeforeUnplayable)) %>%
     {
-    ggplot(.)+theme_bw()+
-    aes(x=PracticeSelfAssesment,y=as.numeric(PercentDigitizedBeforeUnplayable))+
-    stat_bin2d(geom="point",aes(size=..count..),shape=15,binwidth=c(1,20))+
-    guides(fill=F)+
-    scale_x_discrete(limits=c(
-            "Excellent",
-            "Above Average",
-            "Average",
-            "Below Average",
-            "Poor"
+    ggplot(.)+
+    theme_article()+scale_fill_distiller(palette="Spectral")+
+    aes(x=as.numeric(PercentDigitizedBeforeUnplayable),y=StorageConditions)+
+    scale_y_discrete(limits=c(
+            "Archival (vacuum sealed items, cold storage, etc.)",
+            "Temperature/Humidity controlled",
+            "Room temperature",
+            "Uncomfortable for human",
+            "Actively harmful (dirty, hot, humid, etc.)"
             )
         )+
-    scale_size("Responses")+
-    theme(axis.text.x=element_text(angle=90))+
-    xlab("Self-assessment of archival skillz")+
-    ylab("Self-assessed estimate of complete digitization\nbefore media is unplayable (binned into fifths)")
+    stat_bin2d(binwidth=c(10,1))+
+    xlab("Self-assessed estimate of complete digitization\nbefore media is unplayable")+
+    ylab("Responses per bin")+
+    scale_x_continuous(breaks=seq(0,100,10))
     }
-```
+g_storage_vs_complete
 
-## Total itemss of each format type and their obsolescence risk factor
-** POSTER-2**
-```{r format_counts_divided_x_by_risk,cache=T,fig.height=7}
-tdatar %>% 
-    ggplot()+theme_bw()+
-    aes(x=Risk,group=FormatName,weight=EstItemCount,label=FormatName)+
-    geom_point(stat="count")+
-    geom_label_repel(stat="count")+
+g_storage <- all_responses %>%
+    filter(!is.na(StorageConditions)) %>%
+    {
+    ggplot(.)+theme_article()+
+    aes(x=StorageConditions)+
+    scale_x_discrete(limits=c(
+            "Archival (vacuum sealed items, cold storage, etc.)",
+            "Temperature/Humidity controlled",
+            "Room temperature",
+            "Uncomfortable for human",
+            "Actively harmful (dirty, hot, humid, etc.)"
+            ),
+            labels=c(
+            "Archival\n(vacuum sealed items,\ncold storage, etc.)",
+            "Temperature/Humidity\ncontrolled",
+            "Room temperature",
+            "Uncomfortable\nfor humans",
+            "Actively harmful\n(dirty, hot, humid, etc.)"
+            )
+        )+
+    geom_bar(fill="grey40",color="black")+
+    #geom_label(aes(label=..count..,y=..count..),stat="count")+
+    scale_y_continuous(breaks=seq(0,40,5))+
     theme(axis.text.x=element_text(angle=90))+
-    ylab("Total estimated items across survey")+
-    xlab("Risk Estimate")
-```
-TO DO: no label borders and move dots to not overlap
+    xlab("")+
+    ylab("Responses")
+    }
+g_complete <- all_responses %>%
+    filter(!is.na(PercentDigitizedBeforeUnplayable)) %>%
+    {
+    ggplot(.)+theme_article()+
+    aes(x=as.numeric(PercentDigitizedBeforeUnplayable))+
+    stat_bin(binwidth=10,center=5,geom="bar",fill="grey40",color="black")+
+    xlab("Self-assessed estimate of complete\ndigitization before media is unplayable")+
+    ylab("Responses")+
+    scale_x_continuous(breaks=seq(0,100,10))+
+    scale_y_continuous(breaks=seq(0,10,1))
+    }
+g_both <- ggarrange(g_storage,g_complete,nrow=1,labels=c("A","B"))
+g_both
 
-Description: Basic map of qty vs risk
+ggsave("storageConditions_and_completionEstimate.svg",g_both,width=6,height=4)
+ggsave("storageConditions_and_completionEstimate.png",g_both,width=6,height=4)
+```
+
+
+## Total items of each format type and their obsolescence risk factor
+
+**POSTER-2**
+```{r format_counts_divided_x_by_risk,cache=T,fig.height=7}
+g <- tdatar %>% 
+    group_by(FormatName,Risk) %>%
+    summarize(EstTotal=sum(EstItemCount,na.rm=T)) %>%
+    filter(!is.na(Risk)) %>%
+    filter(EstTotal>0) %>%
+    ggplot()+
+    theme_bw()+
+    aes(x=Risk,y=EstTotal,label=FormatName)+
+    geom_text_repel(box.padding=1,segment.color="grey60")+
+    theme(axis.text.x=element_text(angle=90))+
+    ylab("Total estimated items, across survey")+
+    xlab("Risk Estimate")
+g
+g+geom_dotplot(binaxis="y",stackdir="center",binwidth=3e3)
+g+geom_dotplot(binaxis="y",stackdir="center",binwidth=0.05)+
+    scale_y_log10(labels=function(x){formatC(x,big.mark=",",format="d")},
+        breaks=c(500+0.5,1e3,2e3,5e3+0.5,1e4,2e4,5e4+1,1e5,2e5))
+
+ggsave("risk_and_totals_log.png",g+
+    geom_dotplot(binaxis="y",stackdir="center",binwidth=0.05)+
+    scale_y_log10(labels=function(x){formatC(x,big.mark=",",format="d")},
+        breaks=c(500+0.5,1e3,2e3,5e3+0.5,1e4,2e4,5e4+1,1e5,2e5)),
+    width=6,height=6)
+ggsave("risk_and_totals_log.svg",g+
+    geom_dotplot(binaxis="y",stackdir="center",binwidth=0.05)+
+    scale_y_log10(labels=function(x){formatC(x,big.mark=",",format="d")},
+        breaks=c(500+0.5,1e3,2e3,5e3+0.5,1e4,2e4,5e4+1,1e5,2e5)),
+    width=6,height=6)
+
+ggsave("risk_and_totals.png", g+
+    scale_y_continuous(labels=function(x){formatC(x,big.mark=",",format="d")},
+        breaks=seq(0,2e5,2e4))+
+        geom_dotplot(binaxis="y",stackdir="center",binwidth=3e3),
+    width=6,height=6)
+ggsave("risk_and_totals.svg",g+
+    scale_y_continuous(labels=function(x){formatC(x,big.mark=",",format="d")},
+        breaks=seq(0,2e5,2e4))+
+        geom_dotplot(binaxis="y",stackdir="center",binwidth=3e3),
+    width=6,height=6)
+
+```
+
 
 
 ## Estimated Number of Each Format
-** POSTER-3**
+**POSTER-3**
 ```{r total_numbers_of_items_each_format_dist,cache=T}
 tdatar %>% 
     {
