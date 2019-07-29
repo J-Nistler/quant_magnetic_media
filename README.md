@@ -7,8 +7,9 @@ This repository includes all research, data, and analyses related to the quantit
 - Anonymized data from the quantitative questionnaire: [survey_data_2019.csv](https://github.com/darachm/magnets_how_do_they_work/blob/master/survey_data_2019.csv)
 - Choropleth of respondents by state done with [Google GeoChart](https://developers.google.com/chart/interactive/docs/gallery/geochart): [choropleth_data/ folder](https://github.com/darachm/magnets_how_do_they_work/tree/master/choropleth_data)
 - Analyses and computation on the data done with R and ggplot: [report_magnetic_media_survey_2019.Rmd](https://github.com/darachm/magnets_how_do_they_work/blob/master/report_magnetic_media_survey_2019.Rmd). View the [HTML version](https://github.com/darachm/magnets_how_do_they_work/blob/master/report_magnetic_media_survey_2019.html) in your web browser. 
+- Full [Bibliography on Zotero](https://www.zotero.org/groups/2239657/lis570_mag-media-triage)
 
-By: [Sarah Nguyen](https://michi-gato.github.io/), [Jared Nistler](https://jnistler.com/), and [Darach Miller](http://rhesis.com/)
+By: [Jared Nistler](https://jnistler.com/), [Sarah Nguyen](https://michi-gato.github.io/), and [Darach Miller](http://rhesis.com/)
 
 Original contents licensed under [CC-BY-NC-SA](https://creativecommons.org/licenses/by-nc-sa/3.0/) 2019.
 
