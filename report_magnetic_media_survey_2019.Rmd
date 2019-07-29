@@ -466,8 +466,8 @@ g <- tdatar %>%
     xlab("")
     }
 g
-ggsave("items_per_respondent.png",g,width=8,height=6)
-ggsave("items_per_respondent.svg",g,width=8,height=6)
+ggsave("items_per_respondent.png",g,width=6,height=5)
+ggsave("items_per_respondent.svg",g,width=6,height=5)
 
 ```
 
@@ -571,13 +571,14 @@ tickfunc <- function() {
            }
 
 
-svg("magnetic_heatmap_ordered_by_chance_completion_at_top.svg",width=8,height=8)
+svg("magnetic_heatmap_ordered_by_chance_completion_at_top.svg",width=6,height=6)
 heatmap.2(counts_matrix,
     key.xlab="Estimated Items",
     col=colorRampPalette(brewer.pal(n=9,name="PuBuGn"))(100),
     ColSideColors=risk_palette,
-    margins=c(08,2),
-    labRow="",
+    margins=c(08,5),
+    labRow=ifelse(!is.na(heatmap_datar_counts$PercentDigitizedBeforeUnplayable),
+        paste0(heatmap_datar_counts$PercentDigitizedBeforeUnplayable,"%"),"no data"),
     srtCol=45,
     density.info="none",
     trace="none",
@@ -589,13 +590,14 @@ heatmap.2(counts_matrix,
     )
 dev.off()
 
-svg("magnetic_heatmap_clustered_rows.svg",width=8,height=8)
+svg("magnetic_heatmap_clustered_rows.svg",width=6,height=6)
 heatmap.2(counts_matrix,
     key.xlab="Estimated Items",
     col=colorRampPalette(brewer.pal(n=9,name="PuBuGn"))(100),
     ColSideColors=risk_palette,
-    margins=c(08,2),
-    labRow="",
+    margins=c(08,5),
+    labRow=ifelse(!is.na(heatmap_datar_counts$PercentDigitizedBeforeUnplayable),
+        paste0(heatmap_datar_counts$PercentDigitizedBeforeUnplayable,"%"),"no data"),
     srtCol=45,
     density.info="none",
     trace="none",
