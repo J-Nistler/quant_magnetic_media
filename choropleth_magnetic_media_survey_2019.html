@@ -1,0 +1,245 @@
+    <html>
+
+    <head>
+      <meta http-equiv='Content-Type' content='text/html' charset='utf-8' />
+      <script type='text/javascript' src='https://www.google.com/jsapi'></script>
+      <script type='text/javascript'>
+        google.load('visualization', '1', {
+          'packages': ['geochart']
+        });
+        google.setOnLoadCallback(drawRegionsMap);
+
+        function drawRegionsMap() {
+          var data = new google.visualization.DataTable();
+          data.addColumn('string', 'Country');
+          data.addColumn('number', 'Average Summer Temp');
+          data.addRows([
+            [{
+              f: 'Alabama',
+              v: 'US-AL'
+            }, 84.7],
+            [{
+              f: 'Alaska',
+              v: 'US-AK'
+            }, 47.7],
+            [{
+              f: 'Arizona',
+              v: 'US-AZ'
+            }, 84.4],
+            [{
+              f: 'Arkansas',
+              v: 'US-AR'
+            }, 83.1],
+            [{
+              f: 'California',
+              v: 'US-CA'
+            }, 79.7],
+            [{
+              f: 'Colorado',
+              v: 'US-CO'
+            }, 70.4],
+            [{
+              f: 'Connecticut',
+              v: 'US-CT'
+            }, 71.1],
+            [{
+              f: 'Delaware',
+              v: 'US-DE'
+            }, 76],
+            [{
+              f: 'Florida',
+              v: 'US-FL'
+            }, 87.2],
+            [{
+              f: 'Georgia',
+              v: 'US-GA'
+            }, 84.4],
+            [{
+              f: 'Hawaii',
+              v: 'US-HI'
+            }, 77],
+            [{
+              f: 'Idaho',
+              v: 'US-ID'
+            }, 67.4],
+            [{
+              f: 'Illinois',
+              v: 'US-IL'
+            }, 76.5],
+            [{
+              f: 'Indiana',
+              v: 'US-IN'
+            }, 75.9],
+            [{
+              f: 'Iowa',
+              v: 'US-IA'
+            }, 74.1],
+            [{
+              f: 'Kansas',
+              v: 'US-KS'
+            }, 80.3],
+            [{
+              f: 'Kentucky',
+              v: 'US-KY'
+            }, 79],
+            [{
+              f: 'Louisiana',
+              v: 'US-LA'
+            }, 86.1],
+            [{
+              f: 'Maine',
+              v: 'US-ME'
+            }, 64.8],
+            [{
+              f: 'Maryland',
+              v: 'US-MD'
+            }, 76],
+            [{
+              f: 'Massachusetts',
+              v: 'US-MA'
+            }, 69.9],
+            [{
+              f: 'Michigan',
+              v: 'US-MI'
+            }, 68.4],
+            [{
+              f: 'Minnesota',
+              v: 'US-MN'
+            }, 68.2],
+            [{
+              f: 'Mississippi',
+              v: 'US-MS'
+            }, 85.2],
+            [{
+              f: 'Missouri',
+              v: 'US-MO'
+            }, 79],
+            [{
+              f: 'Montana',
+              v: 'US-MT'
+            }, 67],
+            [{
+              f: 'Nebraska',
+              v: 'US-NE'
+            }, 75.6],
+            [{
+              f: 'Nevada',
+              v: 'US-NV'
+            }, 75.2],
+            [{
+              f: 'New Hampshire',
+              v: 'US-NH'
+            }, 67.2],
+            [{
+              f: 'New Jersey',
+              v: 'US-NJ'
+            }, 74.1],
+            [{
+              f: 'New Mexico',
+              v: 'US-NM'
+            }, 78.5],
+            [{
+              f: 'New York',
+              v: 'US-NY'
+            }, 68.5],
+            [{
+              f: 'North Carolina',
+              v: 'US-NC'
+            }, 80],
+            [{
+              f: 'North Dakota',
+              v: 'US-ND'
+            }, 69.2],
+            [{
+              f: 'Ohio',
+              v: 'US-OH'
+            }, 74.4],
+            [{
+              f: 'Oklahoma',
+              v: 'US-OK'
+            }, 83.9],
+            [{
+              f: 'Oregon',
+              v: 'US-OR'
+            }, 68.7],
+            [{
+              f: 'Pennsylvania',
+              v: 'US-PA'
+            }, 71.9],
+            [{
+              f: 'Rhode Island',
+              v: 'US-RI'
+            }, 69.8],
+            [{
+              f: 'South Carolina',
+              v: 'US-SC'
+            }, 83.6],
+            [{
+              f: 'South Dakota',
+              v: 'US-SD'
+            }, 73.1],
+            [{
+              f: 'Tennessee',
+              v: 'US-TN'
+            }, 80.6],
+            [{
+              f: 'Texas',
+              v: 'US-TX'
+            }, 87.1],
+            [{
+              f: 'Utah',
+              v: 'US-UT'
+            }, 73.1],
+            [{
+              f: 'Vermont',
+              v: 'US-VT'
+            }, 66.4],
+            [{
+              f: 'Virginia',
+              v: 'US-VA'
+            }, 77.1],
+            [{
+              f: 'Washington',
+              v: 'US-WA'
+            }, 67.3],
+            [{
+              f: 'West Virginia',
+              v: 'US-WV'
+            }, 74.9],
+            [{
+              f: 'Wisconsin',
+              v: 'US-WI'
+            }, 69],
+            [{
+              f: 'Wyoming',
+              v: 'US-WY'
+            }, 66.8],
+            [{
+              f: 'District of Columbia',
+              v: 'US-DC'
+            }, 76]
+          ]);
+
+          var options = {
+            'title': 'Map',
+            'width': 1100,
+            'height': 800,
+            'region': 'US',
+            'colorAxis': {
+              colors: ['#fee8c8', '#fdd49e', '#fdbb84', '#fc8d59', '#e34a33', '#b30000']
+            },
+            'resolution': 'provinces'
+          };
+
+          var container = document.getElementById('map_canvas');
+          var geochart = new google.visualization.GeoChart(container);
+          geochart.draw(data, options);
+        };
+      </script>
+    </head>
+
+    <body>
+      <div id='map_canvas'></div>
+    </body>
+
+    </html>
