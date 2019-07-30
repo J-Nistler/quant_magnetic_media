@@ -1,6 +1,5 @@
 <h1 align="center">
-  <br>
-  <img src="/img/magneticMediaRepo_Logo.png">
+  <img src="/img/magneticMediaRepo_Logo.png"  width="200">
   <br>
   A Quantitative Approach to the Magnetic Media Crisis
   <br>
