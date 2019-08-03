@@ -352,8 +352,8 @@ to address magnetic media obsolescence and degradation, etc.
 library(tidyverse)
 library(ggrepel)
 library(egg)
-library(ComplexHeatmap)
-library(circlize)
+library(gplots)
+library(RColorBrewer)
 ```
 
 ```{r read_data_risks,cache=T}
@@ -393,13 +393,17 @@ tdatar <- all_responses %>%
     left_join(risk_factors%>%rename(FormatName=Format),by="FormatName")
 ```
 
-## Respondents by Institution Types (DELETE?)
+## Response Collections by Region and Climate
+
+See chloreoplath files
+
+## Respondents are mostly self-identified as academic
 
 This study was targeted towards academic libraries as the main focus, 
 but other archival institutions have enthusiastically participated in
 our survey. 
 We received ``r nrow(all_responses)`` responses, while 
-``r sum(all_responses$InstitutionType!="Academic")`` of these do not 
+``r sum(all_responses$InstitutionType!="Academic",na.rm=T)`` of these do not 
 identify as "Academic".
 
 ```{r responses_by_instutition_type,cache=T}
@@ -415,11 +419,23 @@ all_responses %>%
     }
 ```
 
-## Facility Environmental Conditions
+## Most but not all facilities store media in controlled conditions
 
 We asked respondents to categorize their storage conditions for their 
-collections. ``r sum(is.na(all_responses$StorageConditions))`` respondents 
+collections. 
+The different environmental archival levels are based on the Video
+Preservation Fact Sheet from AMIA. 
+While the majority of the participants maintain 
+“temperature/humidity controlled” storage, some respondents report 
+“actively harmful” and “uncomfortable for humans” environments.
+``r sum(is.na(all_responses$StorageConditions))`` respondents 
 didn't include this information.
+
+Many archivists have access to at least a temperature/humidity controlled
+storage facility and are expecting have most of their magnetic media collection
+successfully digitized. However, some report poor storage conditions or a bleak
+outlook for their collection. Support and coordination amongst digital media
+archivists may help these archivists plan and advocate for their collection.
 
 ```{r responses_by_storage_conditions,cache=T,fig.height=7}
 all_responses %>%
@@ -443,28 +459,18 @@ all_responses %>%
     }
 ```
 
-Each questionnaire participant was asked to self-grade the environmental
-conditions of the infrastructure which the magnetic media items are stored
-within. The different environmental archival levels are based on the Video
-Preservation Fact Sheet from AMIA.26 While the majority of the participants
-boast to maintain “temperature/humidity controlled” for decent preservation of
-magnetic media, the lack of “actively harmful” and “uncomfortable for humans”
-environments is a huge indicator that the survey participants are
-self-selecting. Given the number of institutions who are unable to account for
-the number of items in their collection, this graph shows the study is missing
-input from the “lone ranger archivists.”
+## Archivist skill self-evaluation ranges widely
 
+Respondents were asked to self-evaluate their skills
 
-## Chance of Successful Preservation (DELETE?)
+<!-- yall should actually put the question here -->
 
-This graph of self-reflection on digitization practices must be taken with a
-grain of salt since it is considering the judgment of the archivist managing
-the collection itself. This is their job, and it is less likely for someone to
-openly and truthfully speak poorly of their place of employment practices, even
-if they are answering anonymously. On the other hand, it is encouraging to see
-a positive-skewed bell curve, showing hope and potential in institutions
-investment into A/V digitization practices.
+We expected to find that most archivists were above average, on average, but
+believe that the distribution of self-assessment reflects a healthy 
+self-criticism in the field. 
 
+Future work with surveys or interviews may find it useful to probe where 
+archivists feel their skills are falling short.
 
 ```{r responses_by_self_reflection,cache=T,fig.height=7}
 all_responses %>%
@@ -488,68 +494,27 @@ all_responses %>%
     }
 ```
 
-This graph of self-reflection on digitization practices must be taken with a
-grain of salt since it is considering the judgment of the archivist managing
-the collection itself. This is their job, and it is less likely for someone to
-openly and truthfully speak poorly of their place of employment practices, even
-if they are answering anonymously. On the other hand, it is encouraging to see
-a positive-skewed bell curve, showing hope and potential in institutions
-investment into A/V digitization practices.
+## Many items are estimated to decay before digitization
 
-
-Let's compare them. (DELETE?)
-
-```{r responses_self_versus_storage,cache=T,fig.height=5}
-all_responses %>%
-    filter(!is.na(PracticeSelfAssesment)) %>%
-    filter(!is.na(StorageConditions)) %>%
-    {
-    ggplot(.)+theme_bw()+
-    aes(x=PracticeSelfAssesment,y=StorageConditions)+
-    stat_bin2d(geom="point",aes(size=..count..),shape=15)+
-    guides(fill=F)+
-    scale_x_discrete(limits=c(
-            "Excellent",
-            "Above Average",
-            "Average",
-            "Below Average",
-            "Poor"
-            )
-        )+
-    scale_y_discrete(limits=c(
-            "Archival (vacuum sealed items, cold storage, etc.)",
-            "Temperature/Humidity controlled",
-            "Room temperature",
-            "Uncomfortable for human",
-            "Actively harmful (dirty, hot, humid, etc.)"
-            )
-        )+
-    scale_size("Responses")+
-    theme(axis.text.x=element_text(angle=90))+
-    xlab("Self-assessment of archival skillz")+
-    ylab("Self-assessment of storage conditions")
-    }
-```
-
-point types in R
-http://www.sthda.com/english/wiki/r-plot-pch-symbols-the-different-point-shapes-available-in-r
-
-
-## Chance of Successful Preservation
-
-Of the thirty-six respondents who chose to estimate how much magnetic material
+Of the ``r sum(!is.na(all_responses$PercentDigitizedBeforeUnplayable))``
+respondents who estimated how much magnetic material
 they would be able to digitize, eight—nearly a quarter—were confident they
 would process every item in their collection. However, almost as many
 institutions expressed doubt that they would digitize even a quarter of their
 collections before decay made their tapes unplayable. From a cursory
 examination, there does not appear to be a strict correlation between the size
-of the collection and the estimated digitization rate. Indiana University
-Bloomington, with 226,911 items, is confident they will digitize 99% of their
-holdings, while Wartburg College is bearish about the prospects for their
-15,308 items, estimating they will only digitize 10%. Table 2: Respondent
+of the collection and the estimated digitization rate. 
+
+what guidelines were supplied to help archivists make this assessment?
+
+Table 2: Respondent
 Institutions’ Digitization Progress Rates lists institutions’ current progress
 rate, calculated by their yearly digitization rate as a percentage of their
 total collection.
+
+The bimodality may reflect a binary choice for the respondent, but it is 
+striking that a significant fraction find themselves with little hope for
+preserving their collection.
 
 ```{r percent_completion,cache=T}
 all_responses %>%
@@ -557,14 +522,13 @@ all_responses %>%
     {
     ggplot(.)+theme_bw()+
     aes(x=as.numeric(PercentDigitizedBeforeUnplayable))+
-    stat_bin(binwidth=10,geom="bar")+
+    stat_bin(binwidth=05,geom="bar",col="white")+
     xlab("Self-assessed estimate of complete digitization\nbefore media is unplayable (binned into tenths)")+
-    ylab("Responses per bin (width")+
-    coord_flip()
+    ylab("Responses per bin (width")
     }
 ```
 
-```{r storage_conditions_and_completion,cache=T,fig.height=7}
+```{r storage_conditions_and_completion,cache=T,fig.height=7,eval=F}
 g_storage_vs_complete <- all_responses %>%
     filter(!is.na(StorageConditions)) %>%
     filter(!is.na(PercentDigitizedBeforeUnplayable)) %>%
@@ -588,13 +552,8 @@ g_storage_vs_complete <- all_responses %>%
 g_storage_vs_complete
 ```
 
-Many archivists have access to at leasat a temperature/humidity controlled storage facility and
-are expecting have most of their magntic media collection successfully digitized. However, some
-reportpoor storage conditions or a bleak outlook for their collection. Support and coordination
-amongst digital media archivists may help these archivists plan and advocate for their collection.
 
-```{r morestorage,cache=T,fig.height=7}
-
+```{r making_figures_for_poster,cache=T,fig.height=7}
 g_storage <- all_responses %>%
     filter(!is.na(StorageConditions)) %>%
     {
@@ -633,15 +592,23 @@ g_complete <- all_responses %>%
     scale_x_continuous(breaks=seq(0,100,10))+
     scale_y_continuous(breaks=seq(0,10,1))
     }
-g_both <- ggarrange(g_storage,g_complete,nrow=1,labels=c("A","B"))
-g_both
-
+g_both <- ggarrange(g_storage,g_complete,nrow=1,labels=c("A","B"),draw=F)
 ggsave("storageConditions_and_completionEstimate.svg",g_both,width=6,height=4)
 ggsave("storageConditions_and_completionEstimate.png",g_both,width=6,height=4)
 ```
 
+## There are not as many items left in formats at high-risk of decay
 
-## Quantity and Risk Factor by Format
+Using the classifications from 
+
+To prioritize digitization planning, we compared the sume total of items per
+format to each format's obsolescence risk factor (CLIR, 1995). We found a
+relatively low number of high-risk formats, suggesting that niche high-risk
+formats may be preservable with focused efforts. It is worth noting that this
+pattern may reflect a survivor's bias in collections. 
+
+Comparing the format's risk of decay with the estimated total item count
+allows us to prioritize what formats to target immediately with focused grants.
 
 ```{r format_counts_divided_x_by_risk,cache=T,fig.height=7}
 g <- tdatar %>% 
@@ -656,44 +623,29 @@ g <- tdatar %>%
     theme(axis.text.x=element_text(angle=90))+
     ylab("Total estimated items, across survey")+
     xlab("Risk Estimate")
-g
 
-g+geom_dotplot(binaxis="y",stackdir="center",binwidth=3e3)
-
-g+geom_dotplot(binaxis="y",stackdir="center",binwidth=0.05)+
-    scale_y_log10(labels=function(x){formatC(x,big.mark=",",format="d")},
-        breaks=c(500+0.5,1e3,2e3,5e3+0.5,1e4,2e4,5e4+1,1e5,2e5))
-
-ggsave("risk_and_totals_log.png",g+
-    geom_dotplot(binaxis="y",stackdir="center",binwidth=0.05)+
-    scale_y_log10(labels=function(x){formatC(x,big.mark=",",format="d")},
-        breaks=c(500+0.5,1e3,2e3,5e3+0.5,1e4,2e4,5e4+1,1e5,2e5)),
-    width=6,height=6)
-ggsave("risk_and_totals_log.svg",g+
-    geom_dotplot(binaxis="y",stackdir="center",binwidth=0.05)+
-    scale_y_log10(labels=function(x){formatC(x,big.mark=",",format="d")},
-        breaks=c(500+0.5,1e3,2e3,5e3+0.5,1e4,2e4,5e4+1,1e5,2e5)),
-    width=6,height=6)
-
-ggsave("risk_and_totals.png", g+
+g_risk_totals <- g+
     scale_y_continuous(labels=function(x){formatC(x,big.mark=",",format="d")},
         breaks=seq(0,2e5,2e4),limits=c(-2e4,NA))+
-        geom_dotplot(binaxis="y",stackdir="center",binwidth=3e3),
-    width=6,height=6)
-ggsave("risk_and_totals.svg", g+
-    scale_y_continuous(labels=function(x){formatC(x,big.mark=",",format="d")},
-        breaks=seq(0,2e5,2e4),limits=c(-2e4,NA))+
-        geom_dotplot(binaxis="y",stackdir="center",binwidth=3e3) ,
-    width=6,height=6)
-
+        geom_dotplot(binaxis="y",stackdir="center",binwidth=3e3) 
+g_risk_totals
 ```
 
-To prioritize digitization planning, we compared the sume total of items per format to each format's obsolescence risk factor (CLIR, 1995). We found a relatively low number of high-risk formats, suggesting that niche high-risk formats may be preservable with focused efforts. It is worth noting that this pattern may reflect a survivor's bias in collections. 
+```{r saving_risk_totals_figure,cache=T}
+ggsave("risk_and_totals.png",g_risk_totals,width=6,height=6)
+ggsave("risk_and_totals.svg",g_risk_totals,width=6,height=6)
+```
 
-## Estimated Count of Each Format Per Institution
+## Format abundances vary widely between institutions
+
+Nearly
+all participating institutions have at least one VHS tape, but there are only 3
+archives that need to deal with Digital 8. Either item counts or percentages of
+collection were very heterogeneous, suggesting that there is not one shared set
+of formats that would be served by a standard set of equipment. Would a
+centralized digitization center best address rare formats?
 
 ```{r total_numbers_of_items_each_format_dist,cache=T}
-
 g <- tdatar %>% 
     {
     ggplot(.)+
@@ -714,20 +666,34 @@ g <- tdatar %>%
 g
 ggsave("items_per_respondent.png",g,width=6,height=5)
 ggsave("items_per_respondent.svg",g,width=6,height=5)
-
 ```
 
-Each instituion's collection has a unique composition of item formats. Nearly all participating
-institutions have at least one VHS tape, but there are only 3 archives that need to deal with Digital 8. Either item counts or percentages of collection were very heterogeneous, suggesting that there is not one shared set of formats that would be served by a standard set of equipment. Would a centralized digitization center best address rare formats?
+A similar pattern is seen in examining the proportion of each collection that is
+a format.
 
+```{r proportion_of_items_each_format_dist,cache=T}
+g <- tdatar %>% 
+    {
+    ggplot(.)+
+    theme_bw()+
+    aes(x=FormatName,y=Percentage)+
+    geom_boxplot(outlier.alpha=0,color="grey50")+
+    geom_dotplot(binaxis="y",stackdir="center",alpha=1.0,binwidth=0.02)+
+    scale_y_log10(labels=function(x){formatC(x,big.mark=",",format="d")},
+        limits=c(0.9,NA))+
+    scale_x_discrete(
+        limits=group_by(.,FormatName)%>%
+            summarize(z=sum(EstItemCount,na.rm=T))%>%
+            arrange(-z)%>%pull(FormatName)
+        )+
+    theme(axis.text.x=element_text(angle=90))+
+    ylab("Each respondent's estimated items per format")+
+    xlab("")
+    }
+g
+```
 
-## Response Collections by Region and Climate
-
-See chloreoplath files
-
-
-
-## Final Overview Heat Map: Aggregating Charts for Similarities
+## Overall perspective on survey results
 
 This heat map illustrates an aggregation of the above charts and graphs. The
 hierarchical clustering shows how each format is related or unrelated
@@ -744,8 +710,6 @@ efficient approach to dealing with those collections.
 
 
 ```{r 2nd_heatmap_counts,fig.height=9,fig.width=9,cache=T}
-library(gplots)
-
 heatmap_datar_counts <- tdatar %>% 
     filter(EstItemCount>0) %>%
     select(Key,State,InstitutionType,TotalItems,
@@ -755,16 +719,6 @@ heatmap_datar_counts <- tdatar %>%
 heatmap_datar_counts%>%pull(PercentDigitizedBeforeUnplayable)
 
 counts_matrix <- as.matrix(log10(heatmap_datar_counts[,-c(1,2,3,4,5)]+1))
-
-#risk_palette <- 
-#    rev(colorRampPalette(brewer.pal(n=9,name="Spectral"))(
-#        length(levels(risk_factors$Risk))
-#    ))[
-#        tibble(Format=colnames(heatmap_datar_counts)[
-#                6:ncol(heatmap_datar_counts)]
-#            )%>%    
-#            left_join(risk_factors,by="Format")%>%pull(Risk)
-#        ] 
 
 # Thanks colorbrewer2 website!
 colorz <- setNames(c('#ffffb2','#fecc5c','#fd8d3c','#f03b20','#bd0026'),
@@ -798,7 +752,6 @@ tickfunc <- function() {
            }
 
 
-svg("magnetic_heatmap_ordered_by_chance_completion_at_top.svg",width=6,height=6)
 heatmap.2(counts_matrix,
     key.xlab="Estimated Items",
     col=colorRampPalette(brewer.pal(n=9,name="PuBuGn"))(100),
@@ -815,9 +768,10 @@ heatmap.2(counts_matrix,
     ylab="Respondent, ordered by estimated completion",
     key.xtickfun=tickfunc
     )
-dev.off()
+#svg("magnetic_heatmap_ordered_by_chance_completion_at_top.svg",width=6,height=6)
+# dev.off()
 
-svg("magnetic_heatmap_clustered_rows.svg",width=6,height=6)
+#svg("magnetic_heatmap_clustered_rows.svg",width=6,height=6)
 heatmap.2(counts_matrix,
     key.xlab="Estimated Items",
     col=colorRampPalette(brewer.pal(n=9,name="PuBuGn"))(100),
@@ -833,111 +787,17 @@ heatmap.2(counts_matrix,
     ylab="Respondent",
     key.xtickfun=tickfunc
     )
-dev.off()
-
-
-library(RColorBrewer)
-
+#dev.off()
 
 ```
 
+Clustering of the format's similarities shows that VHS, Compact Cassette, and
+Open Reel Audio tend to have similar patterns of abundance across collections.
+U-Matic, Betacam, Open Reel Video, and MiniDV show a similar cluster of
+co-variability. Each row denotes an institution's response, and is sorted by
+the estimated chance of digitization of their media before deterioration
+occurs. 
 
-Organized by total counts of the items - how important is it overall?
-```{r heatmap_counts,fig.height=9,fig.width=9,cache=T}
-library(seriation)
-
-seriation_of_matrix <- seriate(as.matrix(log10(heatmap_datar_counts[,-c(1,2,3,4)]+1)))
-#, method = "BEA_TSP")
-
-heatmap_datar_counts <- tdatar %>% 
-    filter(EstItemCount>0) %>%
-    select(Key,State,InstitutionType,TotalItems,FormatName,EstItemCount) %>%
-    spread(FormatName,EstItemCount,fill=0)
-
-counts_valz <- log10(unlist(heatmap_datar_counts[,-c(1,2,3,4)])+1)
-
-col_ann <- risk_factors %>% rename(FormatName=Format) %>% as.data.frame()
-rownames(col_ann) <- col_ann[[1]]
-col_ann <- col_ann %>% select(-FormatName) %>% rename(`Format Risk`=Risk)
-
-risk_annotation <- HeatmapAnnotation(
-    `Format Risk`=col_ann$`Format Risk`,
-    col=list(`Format Risk`=c(
-            `Extremely High`="#7b3294",`Very High`="#c2a5cf",
-            `High`="#a6dba0",`Moderate`="#008837"
-    )   )   )
-the_heatmap <- Heatmap(
-    log10(heatmap_datar_counts[,-c(1,2,3,4)]+1),
-    top_annotation=risk_annotation,
-    col=colorRamp2(
-        c(min(counts_valz),median(counts_valz),max(counts_valz)),
-        c("#ffffff", "#fefefe", "#000000")
-        ),
-    heatmap_legend_param = list(
-        title="Item counts", 
-        at=log10(c(10+1,1000+1,1e4+1,5e4+1)),
-        labels=c(10,1000,1e4,5e4),
-        legend_height = unit(6, "cm"),
-        heatmap_legend_side="bottom"
-        ),
-    row_order=get_order(seriation_of_matrix,1),
-    column_order=get_order(seriation_of_matrix,2)
-    )
-ht_list <- the_heatmap 
-g <- draw(ht_list, heatmap_legend_side = "right", annotation_legend_side = "right")
-```
-
-Clustering of the format's similarities shows that VHS, Compact Cassette, and Open Reel Audio tend to have similar patterns of abundance across collections. U-Matic, Betacam, Open Reel Video, and MiniDV show a similar cluster of co-variability. Each row denotes an institution's response, and is sorted by the estimated chance of digitization of their media before deterioration occurs. 
-
-
-** DELETE **
-Organized by fraction of the collection that is each format - 
-how important is it overall?
-```{r heatmap_frac,cache=T,fig.height=9,fig.width=9}
-heatmap_datar_frac <- tdatar %>% 
-    filter(EstItemCount>0) %>%
-    select(Key,State,InstitutionType,TotalItems,FormatName,Percentage) %>%
-    mutate(Fraction=Percentage/100)%>%
-    select(-Percentage) %>%
-    spread(FormatName,Fraction,fill=0)
-
-#TotalItems,StorageConditions,PercentDigitizedBeforeUnplayable,PracticeSelfAssessment,
-
-frac_valz <- unlist(heatmap_datar_frac[,-c(1,2,3,4)])
-
-col_ann <- risk_factors %>% rename(FormatName=Format) %>% as.data.frame()
-rownames(col_ann) <- col_ann[[1]]
-col_ann <- col_ann %>% select(-FormatName) %>% rename(`Format Risk`=Risk)
-
-risk_annotation <- HeatmapAnnotation(
-    `Format Risk`=col_ann$`Format Risk`,
-    col=list(
-        `Format Risk`=c(
-            `Extremely High`="#7b3294",`Very High`="#c2a5cf",
-            `High`="#a6dba0",`Moderate`="#008837"
-            )
-    )   )
-the_heatmap <- Heatmap(
-    log10(heatmap_datar_frac[,-c(1,2,3,4)]+.001),
-    top_annotation=risk_annotation,
-    col=colorRamp2(
-        log10(c(min(frac_valz),median(frac_valz),max(frac_valz))+.001),
-        c("#ffffff", "#fefefe", "#000000")
-        ),
-    heatmap_legend_param = list(
-        title="Fraction of\ncollection", 
-        at=log10(c(0,0.05,0.1,0.30)+0.001),
-        labels=c("1%","5%","10%","30%"),
-        legend_height = unit(6, "cm"),
-        heatmap_legend_side="bottom"
-        )
-    )
-ht_list <- the_heatmap 
-g <- draw(ht_list, heatmap_legend_side = "right", annotation_legend_side = "right")
-
-
-
-```
 
 
 correlation matrix
