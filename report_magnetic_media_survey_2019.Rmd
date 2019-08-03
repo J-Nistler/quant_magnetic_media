@@ -393,13 +393,13 @@ tdatar <- all_responses %>%
     left_join(risk_factors%>%rename(FormatName=Format),by="FormatName")
 ```
 
-## Respondents by Institution Types (DELETE?)
+## Respondents are mostly self-identified as academic
 
 This study was targeted towards academic libraries as the main focus, 
 but other archival institutions have enthusiastically participated in
 our survey. 
 We received ``r nrow(all_responses)`` responses, while 
-``r sum(all_responses$InstitutionType!="Academic")`` of these do not 
+``r sum(all_responses$InstitutionType!="Academic",na.rm=T)`` of these do not 
 identify as "Academic".
 
 ```{r responses_by_instutition_type,cache=T}
@@ -415,10 +415,16 @@ all_responses %>%
     }
 ```
 
-## Facility Environmental Conditions
+## Most but not all facilities store media in controlled conditions
 
 We asked respondents to categorize their storage conditions for their 
-collections. ``r sum(is.na(all_responses$StorageConditions))`` respondents 
+collections. 
+The different environmental archival levels are based on the Video
+Preservation Fact Sheet from AMIA. 
+While the majority of the participants maintain 
+“temperature/humidity controlled” storage, some respondents report 
+“actively harmful” and “uncomfortable for humans” environments.
+``r sum(is.na(all_responses$StorageConditions))`` respondents 
 didn't include this information.
 
 ```{r responses_by_storage_conditions,cache=T,fig.height=7}
@@ -443,28 +449,18 @@ all_responses %>%
     }
 ```
 
-Each questionnaire participant was asked to self-grade the environmental
-conditions of the infrastructure which the magnetic media items are stored
-within. The different environmental archival levels are based on the Video
-Preservation Fact Sheet from AMIA.26 While the majority of the participants
-boast to maintain “temperature/humidity controlled” for decent preservation of
-magnetic media, the lack of “actively harmful” and “uncomfortable for humans”
-environments is a huge indicator that the survey participants are
-self-selecting. Given the number of institutions who are unable to account for
-the number of items in their collection, this graph shows the study is missing
-input from the “lone ranger archivists.”
+## Archivist skill self-evaluation ranges widely
 
+Respondents were asked to self-evaluate their skills
 
-## Chance of Successful Preservation (DELETE?)
+<!-- yall should actually put the question here -->
 
-This graph of self-reflection on digitization practices must be taken with a
-grain of salt since it is considering the judgment of the archivist managing
-the collection itself. This is their job, and it is less likely for someone to
-openly and truthfully speak poorly of their place of employment practices, even
-if they are answering anonymously. On the other hand, it is encouraging to see
-a positive-skewed bell curve, showing hope and potential in institutions
-investment into A/V digitization practices.
+We expected to find that most archivists were above average, on average, but
+believe that the distribution of self-assessment reflects a healthy 
+self-criticism in the field. 
 
+Future work with surveys or interviews may find it useful to probe where 
+archivists feel their skills are falling short.
 
 ```{r responses_by_self_reflection,cache=T,fig.height=7}
 all_responses %>%
@@ -487,53 +483,6 @@ all_responses %>%
     ylab("Responses")
     }
 ```
-
-This graph of self-reflection on digitization practices must be taken with a
-grain of salt since it is considering the judgment of the archivist managing
-the collection itself. This is their job, and it is less likely for someone to
-openly and truthfully speak poorly of their place of employment practices, even
-if they are answering anonymously. On the other hand, it is encouraging to see
-a positive-skewed bell curve, showing hope and potential in institutions
-investment into A/V digitization practices.
-
-
-Let's compare them. (DELETE?)
-
-```{r responses_self_versus_storage,cache=T,fig.height=5}
-all_responses %>%
-    filter(!is.na(PracticeSelfAssesment)) %>%
-    filter(!is.na(StorageConditions)) %>%
-    {
-    ggplot(.)+theme_bw()+
-    aes(x=PracticeSelfAssesment,y=StorageConditions)+
-    stat_bin2d(geom="point",aes(size=..count..),shape=15)+
-    guides(fill=F)+
-    scale_x_discrete(limits=c(
-            "Excellent",
-            "Above Average",
-            "Average",
-            "Below Average",
-            "Poor"
-            )
-        )+
-    scale_y_discrete(limits=c(
-            "Archival (vacuum sealed items, cold storage, etc.)",
-            "Temperature/Humidity controlled",
-            "Room temperature",
-            "Uncomfortable for human",
-            "Actively harmful (dirty, hot, humid, etc.)"
-            )
-        )+
-    scale_size("Responses")+
-    theme(axis.text.x=element_text(angle=90))+
-    xlab("Self-assessment of archival skillz")+
-    ylab("Self-assessment of storage conditions")
-    }
-```
-
-point types in R
-http://www.sthda.com/english/wiki/r-plot-pch-symbols-the-different-point-shapes-available-in-r
-
 
 ## Chance of Successful Preservation
 
