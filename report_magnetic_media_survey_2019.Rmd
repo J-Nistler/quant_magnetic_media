@@ -352,8 +352,8 @@ to address magnetic media obsolescence and degradation, etc.
 library(tidyverse)
 library(ggrepel)
 library(egg)
-library(ComplexHeatmap)
-library(circlize)
+library(gplots)
+library(RColorBrewer)
 ```
 
 ```{r read_data_risks,cache=T}
@@ -693,11 +693,7 @@ g <- tdatar %>%
 g
 ```
 
-
-
-
-
-## Final Overview Heat Map: Aggregating Charts for Similarities
+## Overall perspective on survey results
 
 This heat map illustrates an aggregation of the above charts and graphs. The
 hierarchical clustering shows how each format is related or unrelated
@@ -714,8 +710,6 @@ efficient approach to dealing with those collections.
 
 
 ```{r 2nd_heatmap_counts,fig.height=9,fig.width=9,cache=T}
-library(gplots)
-
 heatmap_datar_counts <- tdatar %>% 
     filter(EstItemCount>0) %>%
     select(Key,State,InstitutionType,TotalItems,
@@ -725,16 +719,6 @@ heatmap_datar_counts <- tdatar %>%
 heatmap_datar_counts%>%pull(PercentDigitizedBeforeUnplayable)
 
 counts_matrix <- as.matrix(log10(heatmap_datar_counts[,-c(1,2,3,4,5)]+1))
-
-#risk_palette <- 
-#    rev(colorRampPalette(brewer.pal(n=9,name="Spectral"))(
-#        length(levels(risk_factors$Risk))
-#    ))[
-#        tibble(Format=colnames(heatmap_datar_counts)[
-#                6:ncol(heatmap_datar_counts)]
-#            )%>%    
-#            left_join(risk_factors,by="Format")%>%pull(Risk)
-#        ] 
 
 # Thanks colorbrewer2 website!
 colorz <- setNames(c('#ffffb2','#fecc5c','#fd8d3c','#f03b20','#bd0026'),
@@ -768,7 +752,6 @@ tickfunc <- function() {
            }
 
 
-svg("magnetic_heatmap_ordered_by_chance_completion_at_top.svg",width=6,height=6)
 heatmap.2(counts_matrix,
     key.xlab="Estimated Items",
     col=colorRampPalette(brewer.pal(n=9,name="PuBuGn"))(100),
@@ -785,9 +768,10 @@ heatmap.2(counts_matrix,
     ylab="Respondent, ordered by estimated completion",
     key.xtickfun=tickfunc
     )
-dev.off()
+#svg("magnetic_heatmap_ordered_by_chance_completion_at_top.svg",width=6,height=6)
+# dev.off()
 
-svg("magnetic_heatmap_clustered_rows.svg",width=6,height=6)
+#svg("magnetic_heatmap_clustered_rows.svg",width=6,height=6)
 heatmap.2(counts_matrix,
     key.xlab="Estimated Items",
     col=colorRampPalette(brewer.pal(n=9,name="PuBuGn"))(100),
@@ -803,111 +787,17 @@ heatmap.2(counts_matrix,
     ylab="Respondent",
     key.xtickfun=tickfunc
     )
-dev.off()
-
-
-library(RColorBrewer)
-
+#dev.off()
 
 ```
 
+Clustering of the format's similarities shows that VHS, Compact Cassette, and
+Open Reel Audio tend to have similar patterns of abundance across collections.
+U-Matic, Betacam, Open Reel Video, and MiniDV show a similar cluster of
+co-variability. Each row denotes an institution's response, and is sorted by
+the estimated chance of digitization of their media before deterioration
+occurs. 
 
-Organized by total counts of the items - how important is it overall?
-```{r heatmap_counts,fig.height=9,fig.width=9,cache=T}
-library(seriation)
-
-seriation_of_matrix <- seriate(as.matrix(log10(heatmap_datar_counts[,-c(1,2,3,4)]+1)))
-#, method = "BEA_TSP")
-
-heatmap_datar_counts <- tdatar %>% 
-    filter(EstItemCount>0) %>%
-    select(Key,State,InstitutionType,TotalItems,FormatName,EstItemCount) %>%
-    spread(FormatName,EstItemCount,fill=0)
-
-counts_valz <- log10(unlist(heatmap_datar_counts[,-c(1,2,3,4)])+1)
-
-col_ann <- risk_factors %>% rename(FormatName=Format) %>% as.data.frame()
-rownames(col_ann) <- col_ann[[1]]
-col_ann <- col_ann %>% select(-FormatName) %>% rename(`Format Risk`=Risk)
-
-risk_annotation <- HeatmapAnnotation(
-    `Format Risk`=col_ann$`Format Risk`,
-    col=list(`Format Risk`=c(
-            `Extremely High`="#7b3294",`Very High`="#c2a5cf",
-            `High`="#a6dba0",`Moderate`="#008837"
-    )   )   )
-the_heatmap <- Heatmap(
-    log10(heatmap_datar_counts[,-c(1,2,3,4)]+1),
-    top_annotation=risk_annotation,
-    col=colorRamp2(
-        c(min(counts_valz),median(counts_valz),max(counts_valz)),
-        c("#ffffff", "#fefefe", "#000000")
-        ),
-    heatmap_legend_param = list(
-        title="Item counts", 
-        at=log10(c(10+1,1000+1,1e4+1,5e4+1)),
-        labels=c(10,1000,1e4,5e4),
-        legend_height = unit(6, "cm"),
-        heatmap_legend_side="bottom"
-        ),
-    row_order=get_order(seriation_of_matrix,1),
-    column_order=get_order(seriation_of_matrix,2)
-    )
-ht_list <- the_heatmap 
-g <- draw(ht_list, heatmap_legend_side = "right", annotation_legend_side = "right")
-```
-
-Clustering of the format's similarities shows that VHS, Compact Cassette, and Open Reel Audio tend to have similar patterns of abundance across collections. U-Matic, Betacam, Open Reel Video, and MiniDV show a similar cluster of co-variability. Each row denotes an institution's response, and is sorted by the estimated chance of digitization of their media before deterioration occurs. 
-
-
-** DELETE **
-Organized by fraction of the collection that is each format - 
-how important is it overall?
-```{r heatmap_frac,cache=T,fig.height=9,fig.width=9}
-heatmap_datar_frac <- tdatar %>% 
-    filter(EstItemCount>0) %>%
-    select(Key,State,InstitutionType,TotalItems,FormatName,Percentage) %>%
-    mutate(Fraction=Percentage/100)%>%
-    select(-Percentage) %>%
-    spread(FormatName,Fraction,fill=0)
-
-#TotalItems,StorageConditions,PercentDigitizedBeforeUnplayable,PracticeSelfAssessment,
-
-frac_valz <- unlist(heatmap_datar_frac[,-c(1,2,3,4)])
-
-col_ann <- risk_factors %>% rename(FormatName=Format) %>% as.data.frame()
-rownames(col_ann) <- col_ann[[1]]
-col_ann <- col_ann %>% select(-FormatName) %>% rename(`Format Risk`=Risk)
-
-risk_annotation <- HeatmapAnnotation(
-    `Format Risk`=col_ann$`Format Risk`,
-    col=list(
-        `Format Risk`=c(
-            `Extremely High`="#7b3294",`Very High`="#c2a5cf",
-            `High`="#a6dba0",`Moderate`="#008837"
-            )
-    )   )
-the_heatmap <- Heatmap(
-    log10(heatmap_datar_frac[,-c(1,2,3,4)]+.001),
-    top_annotation=risk_annotation,
-    col=colorRamp2(
-        log10(c(min(frac_valz),median(frac_valz),max(frac_valz))+.001),
-        c("#ffffff", "#fefefe", "#000000")
-        ),
-    heatmap_legend_param = list(
-        title="Fraction of\ncollection", 
-        at=log10(c(0,0.05,0.1,0.30)+0.001),
-        labels=c("1%","5%","10%","30%"),
-        legend_height = unit(6, "cm"),
-        heatmap_legend_side="bottom"
-        )
-    )
-ht_list <- the_heatmap 
-g <- draw(ht_list, heatmap_legend_side = "right", annotation_legend_side = "right")
-
-
-
-```
 
 
 correlation matrix
