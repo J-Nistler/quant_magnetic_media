@@ -1,5 +1,7 @@
 ---
-title: "A Quantitative Approach to the Status of the Magnetic Media Crisis: From Hoping to Knowing"
+title: 
+    "A Quantitative Approach to the Status of the Magnetic Media Crisis: 
+    From Hoping to Knowing"
 author:
     - "Jared Nistler"
     - "Sarah Nguyen"
@@ -35,11 +37,21 @@ abstract: |
     will offer numbers to support institutions and archivists to obtain funding
     and prepare for the digitization to preservation processes before twenty 
     years pass and the magnetic media content is just a sticky memory. 
+output:
+    html_document:
+        toc: true
+        theme: journal
 ---
 
 ```{r set_global_knit_options,echo=F,message=F,error=T}
+# This is to just globally mute a lot of messages and errors
 knitr::opts_chunk$set(echo=F,message=F,error=T,warning=F)
 ```
+
+<!-- this is commented out
+    Do not start things with tabs or 4+ spaces
+    Markdown interprets that as code
+    -->
 
 # Introduction
 
@@ -261,21 +273,21 @@ management strategies can be applied in varying degrees to any institution.
 These strategies will be considered best practices for the purpose of this
 study.
 
-Good preservation management strategies have been established in a few institutions, but in order to implement them, archivists must be aware of the stakes. By determining the amount of magnetic media in archives, the ratio of the media that has been digitized, and the formats on hand, the true scope of the problem can be assessed. Allowing archivists to better determine the time and money needed to save these valuable collections, and to advocate for greater resources with which to do so.
-
-
+Good preservation management strategies have been established in a few
+institutions, but in order to implement them, archivists must be aware of the
+stakes. By determining the amount of magnetic media in archives, the ratio of
+the media that has been digitized, and the formats on hand, the true scope of
+the problem can be assessed. Allowing archivists to better determine the time
+and money needed to save these valuable collections, and to advocate for
+greater resources with which to do so.
 
 # Methods
 
-<!-- this is commented out
-    Do not start things with tabs or 4+ spaces
-    Markdown interprets that as code
-    -->
 
 This study involved mixed methodologies to answering the research question:
-*What is the preservation status of magnetic media collections in academic* 
-*libraries and archives, and to what degree are they endangered by degradation*
-*and obsolescence?* From a questionnaire fulfilled by a sample of academic
+_What is the preservation status of magnetic media collections in academic
+libraries and archives, and to what degree are they endangered by degradation
+and obsolescence?_ From a questionnaire fulfilled by a sample of academic
 libraries, quantitative data was gathered on collection size, format composition,
 and digitization percentage to evaluate the current state of magnetic media
 collections. Along with quantitative data, qualitative data was collected through
@@ -302,11 +314,11 @@ AMIA listservs, Twitter, and emails sent to individual contacts. Email messages
 were adapted depending on the profession/personal relationships we had with the 
 individual librarians and archivists. The questionnaire was initially circulated 
 to all listservs on the night of November 7th and closed on November 21, 2018—a 
-total of two full weeks. Throughout the two weeks in which the survey was open, 
-individual and institutional reference emails were messaged for continual outreach. 
-Once the questionnaire closed, data was cleaned and processed using OpenRefine and 
-Google Sheets. R was used to create visualizations and additional data analysis after 
-initial findings warranted a deeper evaluation.
+total of two full weeks. Throughout the two weeks in which the survey was open,
+individual and institutional reference emails were messaged for continual
+outreach.  Once the questionnaire closed, data was cleaned and processed using
+OpenRefine and Google Sheets. R was used to create visualizations and
+additional data analysis after initial findings warranted a deeper evaluation.
 
 ## Interviews 
 
@@ -318,6 +330,7 @@ While the main focus was on the questionnaire for the quantitative effects,
 approximately thirty-minute conversations with several professionals offered
 more in-depth conversations that could not be gleaned from a short online
 questionnaire. These interviews questions focused on topics such as:
+
 - How do institutions prioritize their collections?
 - How are institutions staffed and budgeted?
 - What resources are allocated to support the preservation program?
@@ -334,8 +347,6 @@ successes and failures, challenges, actions institutions needs to make in order
 to address magnetic media obsolescence and degradation, etc.
 
 # Results
-
-## Estimated Count of Each Format Per Institution
 
 ```{r load_libraries}
 library(tidyverse)
@@ -380,15 +391,16 @@ tdatar <- all_responses %>%
     mutate(EstItemCount=TotalItems*Percentage/100) %>%
     mutate(FormatName=sub("Percentage_","",Format)) %>% 
     left_join(risk_factors%>%rename(FormatName=Format),by="FormatName")
-
 ```
 
-
-We received ``r nrow(all_responses)`` responses. 
-
-Each instituion's collection has a unique composition of item formats. Nearly all participating institutions have at least one VHS tape, but there are only 3 archives that need to deal with Digital 8. Either item counts or percentages of collection were very heterogeneous, suggesting that there is not one shared set of formats that would be served by a standard set of equipment. Would a centralized digitization center best address rare formats?
-
 ## Respondents by Institution Types (DELETE?)
+
+This study was targeted towards academic libraries as the main focus, 
+but other archival institutions have enthusiastically participated in
+our survey. 
+We received ``r nrow(all_responses)`` responses, while 
+``r sum(all_responses$InstitutionType!="Academic")`` of these do not 
+identify as "Academic".
 
 ```{r responses_by_instutition_type,cache=T}
 all_responses %>%
@@ -403,27 +415,11 @@ all_responses %>%
     }
 ```
 
-This research question specifically identified academic libraries as the main
-focus, but other archival institutions have enthusiastically participated in
-our survey. 
-
-Despite a chunk of participants being non-academic libraries, the
-research scope did not change and data from these other institutions are not
-included in the final analysis. 
-
-``r sum(all_responses$InstitutionType!="Academic")``
-of these are not "Academic"
-
-Shouldn't we include all of these? What's the difference?
-
-However, the data trends are interesting and
-can be applied to other institutions, there may be an opportunity for further
-research.
-
-
 ## Facility Environmental Conditions
 
-``r sum(is.na(all_responses$StorageConditions))`` didn't respond
+We asked respondents to categorize their storage conditions for their 
+collections. ``r sum(is.na(all_responses$StorageConditions))`` respondents 
+didn't include this information.
 
 ```{r responses_by_storage_conditions,cache=T,fig.height=7}
 all_responses %>%
