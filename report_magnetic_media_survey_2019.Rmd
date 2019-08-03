@@ -393,6 +393,10 @@ tdatar <- all_responses %>%
     left_join(risk_factors%>%rename(FormatName=Format),by="FormatName")
 ```
 
+## Response Collections by Region and Climate
+
+See chloreoplath files
+
 ## Respondents are mostly self-identified as academic
 
 This study was targeted towards academic libraries as the main focus, 
@@ -632,11 +636,16 @@ ggsave("risk_and_totals.png",g_risk_totals,width=6,height=6)
 ggsave("risk_and_totals.svg",g_risk_totals,width=6,height=6)
 ```
 
+## Format abundances vary widely between institutions
 
-## Estimated Count of Each Format Per Institution
+Nearly
+all participating institutions have at least one VHS tape, but there are only 3
+archives that need to deal with Digital 8. Either item counts or percentages of
+collection were very heterogeneous, suggesting that there is not one shared set
+of formats that would be served by a standard set of equipment. Would a
+centralized digitization center best address rare formats?
 
 ```{r total_numbers_of_items_each_format_dist,cache=T}
-
 g <- tdatar %>% 
     {
     ggplot(.)+
@@ -657,16 +666,34 @@ g <- tdatar %>%
 g
 ggsave("items_per_respondent.png",g,width=6,height=5)
 ggsave("items_per_respondent.svg",g,width=6,height=5)
-
 ```
 
-Each instituion's collection has a unique composition of item formats. Nearly all participating
-institutions have at least one VHS tape, but there are only 3 archives that need to deal with Digital 8. Either item counts or percentages of collection were very heterogeneous, suggesting that there is not one shared set of formats that would be served by a standard set of equipment. Would a centralized digitization center best address rare formats?
+A similar pattern is seen in examining the proportion of each collection that is
+a format.
+
+```{r proportion_of_items_each_format_dist,cache=T}
+g <- tdatar %>% 
+    {
+    ggplot(.)+
+    theme_bw()+
+    aes(x=FormatName,y=Percentage)+
+    geom_boxplot(outlier.alpha=0,color="grey50")+
+    geom_dotplot(binaxis="y",stackdir="center",alpha=1.0,binwidth=0.02)+
+    scale_y_log10(labels=function(x){formatC(x,big.mark=",",format="d")},
+        limits=c(0.9,NA))+
+    scale_x_discrete(
+        limits=group_by(.,FormatName)%>%
+            summarize(z=sum(EstItemCount,na.rm=T))%>%
+            arrange(-z)%>%pull(FormatName)
+        )+
+    theme(axis.text.x=element_text(angle=90))+
+    ylab("Each respondent's estimated items per format")+
+    xlab("")
+    }
+g
+```
 
 
-## Response Collections by Region and Climate
-
-See chloreoplath files
 
 
 
