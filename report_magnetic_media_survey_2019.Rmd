@@ -1,5 +1,7 @@
 ---
-title: "A Quantitative Approach to the Status of the Magnetic Media Crisis: From Hoping to Knowing"
+title: 
+    "A Quantitative Approach to the Status of the Magnetic Media Crisis: 
+    From Hoping to Knowing"
 author:
     - "Jared Nistler"
     - "Sarah Nguyen"
@@ -35,65 +37,257 @@ abstract: |
     will offer numbers to support institutions and archivists to obtain funding
     and prepare for the digitization to preservation processes before twenty 
     years pass and the magnetic media content is just a sticky memory. 
+output:
+    html_document:
+        toc: true
+        theme: journal
 ---
 
 ```{r set_global_knit_options,echo=F,message=F,error=T}
+# This is to just globally mute a lot of messages and errors
 knitr::opts_chunk$set(echo=F,message=F,error=T,warning=F)
 ```
-
-# Introduction
-
-During the twentieth century, vast amounts of valuable historical and cultural information were recorded on magnetic tape—a recording medium made of “a thin layer capable of recording a magnetic signal supported by a thicker film backing.” These items, known as “magnetic media,” include objects such as VHS, compact cassette, U-matic, 7-inch reels, and more. While cost-effective and accessible at the time, magnetic media has a limited archival lifespan. At the end of its life, the magnetic coating can begin to degrade and decay, especially when stored in suboptimal conditions, endangering the survival of its contents. Additionally, as these formats age, the availability of playback equipment and experts who can repair and maintain that equipment decrease with every year until they are completely obsolete. In a race against the clock, archival institutions are limited both by funds and time as they attempt to preserve valuable media before it degrades into unreadability. These institutions must carefully schedule and prioritize their digitization efforts, taking into account their mission, the contents of their collections, and the type of material which they accession.
-
-It is widely recognized that archivists are facing a “magnetic media crisis,” but unfortunately, any existing quantitative literature on the issue is sorely lacking. Few attempts have been made to systematically assess the state of audiovisual (A/V) magnetic media collections. That quantitative gap is the focus of this project.
-
-This study surveyed academic libraries and archives in order to gather quantitative data on collection size, format composition, and digitization percentage to evaluate the current state of magnetic media collections. Several A/V archivists currently working in the field were also interviewed to gather a qualitative understanding of their collection management strategies and digitization workflows. Our results will illustrate the scope of the issue, helping archival institutions to better advocate for their preservation needs.
-
-# Background: What is Magnetic Media?
-
-Magnetic tape is a long, thin strip of material composed of several polymer layers. The “top coat” of the polymer contains magnetic pigments that encode audio or visual information, and it adheres to a “substrate” layer which supports the thin top coat (see Figure 1). On many tapes, especially those produced after the 1970s, a third layer of backing is attached to the other side of the substrate in order to reduce friction and static. For recording, playback and storage purposes, the tape is generally wound around reels or rolled up inside specialized plastic cassettes. Into the early twenty-first century, magnetic tape was used by television broadcasters, artists and the entertainment industry, government and nonprofit organizations, educators, and countless private individuals; all of whom recorded nigh-endless amounts of cultural heritage. 
-
-Unfortunately, magnetic tape has several inherent vices that have led to a preservation crisis. Mike Casey calls the magnetic media crisis a “perfect storm,” because the collections are growing in size and importance (through acquisitions, donations, and requests) as they are simultaneously fading into obsolescence. The problems that Casey identifies for archival institutions regarding magnetic media include “large numbers, obsolescence, degradation, high research value, and short time window.”  The first challenge archivists face is identifying just how much of the once-ubiquitous material exists. The next challenge is its limited lifespan. As magnetic media ages, the top coat and backing absorb moisture, causing the tape to become sticky and fall apart. This condition is known as “sticky-shed syndrome” and can render the item unplayable, as well as cause damage to playback equipment.
-
-Limited lifespan and large numbers make the magnetic media crisis daunting enough. However, not only are the old tapes degrading beyond readability, but the machines, hardware, and software needed to digitize valuable content are harder to come by and face obsolescence themselves. Furthermore, as the tools used to work with obsolete magnetic media slowly fade into memory so do the skills and institutional knowledge needed to operate legacy platforms.
-
-In some cases, the content on magnetic tapes represents the clearest picture of an event, person, or place in history, capturing speech patterns, rhythms, and even coughs as they sputtered out in real time. That information’s potential loss poses a serious threat to the historical record, if not addressed immediately. 
-
-# Literature Review: Admitting There’s a Problem
-
-The literature on magnetic media preservation is extensive but suffers from significant gaps—most notably a lack of quantitative data about the scope and scale of the preservation crisis. It is widely known that magnetic tape degrades over time and that digitizing the information stored on tape, in preparation to preserve, is difficult and expensive. As a result, several institutions have begun to develop and publish preservation plans. However, there appears to be no general survey of how much magnetic media exists in academic libraries and what state the collections are in. Not knowing the scale of magnetic media collections that exist in libraries today makes it difficult to present a clear picture of the crisis to administrators who ultimately determine resource allocation. Therefore, the researcher team sought to assess the amount of magnetic media in academic library collections, the formats in which it exists, and the ratio of each collection that has been digitized versus the amount left to preserve.
-
-Magnetic tape was a significant medium of information exchange for decades, and as such, is widely studied by archivists and industrial chemists alike. Detailed guides to identifying and preserving different magnetic tape formats are available for archivists accessioning new magnetic media. Libraries and government-backed groups have published extensive surveys of tape’s chemical properties and the potential negative reactions that it can undergo in response to age or poor storage conditions. The physical characteristics of magnetic tape are well-established and inform the context of our research.
-
-The literature also clearly speaks to the difficulties and high costs of digitization and preservation. For example, archivists at Indiana University Bloomington’s Media Digitization and Preservation Initiative (MDPI) estimates that their video collections will amount to 39PB of data that will need to be stored and maintained for years to come. That is almost two hundred thousand 2TB external hard drives; not to mention the labor, infrastructure to store the servers, preserved magnetic media, backups, and software tools associated with the entire digitization and preservation workflow. Basic magnetic media preservation requires, but is not limited to, these tasks listed in the Association of Moving Image Archivists (AMIA) Videotape Preservation Fact Sheets: “controlled temperature and humidity environmental conditions, contamination and demagnetization prevention, tape inspection, tape cleaning, equipment maintenance, rejuvenating unplayable tapes, staff training, and then the entire re-formatting and conversion to digital process.” Within each top-level task, there are specialized tools, nearly-obsolete playback hardware, software, and meticulous techniques to conserve magnetic artifacts while digitizing the content to the “most faithful reproduction of an original work.“
-
-There are a variety of issues that result from magnetic material deterioration, one being sticky-shed syndrome (SSS), and few affordable and efficient troubleshooting techniques to address them. Many of these issues are barely irreversible. In the case of SSS, moisture and humidity break down the tape’s polymers that bind the magnetic particles, “causing the tape to become sticky or gummy”, leading to the tape shedding its magnetic coating and “results in loss of signal and therefore content.”  Alternative troubleshooting techniques have been proposed to address SSS without the need for losing the integrity of the magnetic tape and accelerating the degradation process, which is another issue from the most common baking technique when attempting to preserve signal and data loss from magnetic degradation. A 2013 article by Charles Richardson claims to have found a miracle cure for the blight; however, there are inconsistencies with his work. First, his paper does not provide enough detail to properly reproduce the scientific study used to generate his data. He claims that archivists should not use heat or chemicals on magnetic tape, then describes a process that uses chemicals on tape. He asserts that the process does not damage the tape, but removing the back layer and cleaning the oxide layer may prove extremely destructive to delicate tapes. Finally, he states that baking tapes is incredibly destructive; however, it is an industry standard that has been working for years. Contradictory studies like these can muddy the waters and make it difficult to create an effective digitization and preservation plan.
-
-With magnetic media at such a high risk for obsolescence and degradation, the first step in facing the crisis is to establish comprehensive preservation management solutions. Ross Harvey and Martha R. Mahard have attempted to establish best practices in their book The Preservation Management Handbook. According to Harvey and Mahard, the preservation management process is broken down into five steps. First, the archivist should conduct a survey of the facility that the collections are stored in to ensure proper temperature, humidity, and maintenance. Second, the archivist should ensure that the facility is prepared for any natural disasters that may occur in the local area. Third, the archivist should evaluate the collection using available collection management software such as UC Berkeley’s CALIPR tool or Columbia University’s AVDb software. Fourth, the archivist should create a plan of action based on the assessment and available resources. Finally, the archivist should frame that plan to mesh with higher echelon institutional values and mission statements. While this is a broad overview of managing the preservation process, it is easier said than done.
-
-While Harvey and Marhard’s book appears to be comprehensive, the text lacks depth and actual guidance on how to manage a collection in practice. Furthermore, pages dedicated to each item format lack any information on what or how to prioritize items for preservation; arguably one of the most important facets of archival collection management. Even though the paper is from 2014, the recommended tools are already outdated and utilize prioritization algorithms that are tailored to the institutions that created them. Most importantly, the tools are not relevant in taking on new knowledge about the degradation and obsolescence of magnetic media into account. For example, Columbia University’s AVDb software utilizes an algorithm which was based partly on Wheeler’s handbook and considers the majority of magnetic media to be as stable as Blu-ray discs. There is a huge flaw in the belief that magnetic media and even discs are stable preservation mediums—which is a completely separate research study—but as Jason Scott of the Internet Archive has repeatedly stated: disk storage is not more stable than tape. Each of these mediums requires a machine and energy to run in order to retrieve and process. All of these existing solutions have questionable dependencies to storage mediums that are increasingly becoming obsolete each passing year.
-
-In 2011, Indiana University Bloomington saw the failures in established preservation management paradigms and decided to become a national leader in creating a new standard. While managing preservation for their own institution, Indiana University Bloomington decided to write their Meeting the Challenge of Media Preservation report in such a way that any institution could implement good preservation management strategies modeled off of their example; this report includes digitization practices. Indiana University Bloomington's emphasis is largely based around film preservation, but the strategies and solutions provided in their report were purposely written to be inclusive to all items in an institution’s collection. This comprehensive report outlines all of Harvey and Mahard’s strategies, as they referenced the Indiana University Bloomington report in their literature, but focuses on the application rather than the theory. Any institution looking to properly address the magnetic media crisis could look to Indiana University Bloomington as a national leader and use what they have successfully implemented as a guide to their own institution-specific preservation and digitization management solutions. 
-
-The report describes how Indiana University Bloomington reached out to partners both on and off campus. Taking into consideration all stakeholders’ rights and responsibilities to preservation is also recommended as best practice by Mary Feeney out of the University of Arizona. Additionally, the report describes a workflow where minimal metadata is recorded during the digitization process. Larisa K. Miller at the Hoover Institution Archives describes a similar strategy while digitizing manuscripts, separating the metadata workflow from the digitization workflow to increase efficiency. Miller later described how digitizing with limited metadata could ameliorate the magnetic media crisis. The report by Indiana University Bloomington continues with numerous other strategies and solutions, establishing a standard that previously did not exist. 
-
-Even well-funded preservation projects can take several years to complete. The preservation management strategy that an institution has in place today can give researchers a good indication of where they will be a decade from now. If academic libraries do not have an actionable and solidified plan to digitize and preserve magnetic media at the time of our research survey, they will likely lose a significant portion of their magnetic media to degradation or obsolescence. While Indiana University Bloomington’s preservation program is more robust than any other institution in the United States, their preservation management strategies can be applied in varying degrees to any institution. These strategies will be considered best practices for the purpose of this study.
-
-Good preservation management strategies have been established in a few institutions, but in order to implement them, archivists must be aware of the stakes. By determining the amount of magnetic media in archives, the ratio of the media that has been digitized, and the formats on hand, the true scope of the problem can be assessed. Allowing archivists to better determine the time and money needed to save these valuable collections, and to advocate for greater resources with which to do so.
-
-
-
-# Methods
 
 <!-- this is commented out
     Do not start things with tabs or 4+ spaces
     Markdown interprets that as code
     -->
 
+# Introduction
+
+During the twentieth century, vast amounts of valuable historical and cultural
+information were recorded on magnetic tape—a recording medium made of “a thin
+layer capable of recording a magnetic signal supported by a thicker film
+backing.” These items, known as “magnetic media,” include objects such as VHS,
+compact cassette, U-matic, 7-inch reels, and more. While cost-effective and
+accessible at the time, magnetic media has a limited archival lifespan. At the
+end of its life, the magnetic coating can begin to degrade and decay,
+especially when stored in suboptimal conditions, endangering the survival of
+its contents. Additionally, as these formats age, the availability of playback
+equipment and experts who can repair and maintain that equipment decrease with
+every year until they are completely obsolete. In a race against the clock,
+archival institutions are limited both by funds and time as they attempt to
+preserve valuable media before it degrades into unreadability. These
+institutions must carefully schedule and prioritize their digitization efforts,
+taking into account their mission, the contents of their collections, and the
+type of material which they accession.
+
+It is widely recognized that archivists are facing a “magnetic media crisis,”
+but unfortunately, any existing quantitative literature on the issue is sorely
+lacking. Few attempts have been made to systematically assess the state of
+audiovisual (A/V) magnetic media collections. That quantitative gap is the
+focus of this project.
+
+This study surveyed academic libraries and archives in order to gather
+quantitative data on collection size, format composition, and digitization
+percentage to evaluate the current state of magnetic media collections. Several
+A/V archivists currently working in the field were also interviewed to gather a
+qualitative understanding of their collection management strategies and
+digitization workflows. Our results will illustrate the scope of the issue,
+helping archival institutions to better advocate for their preservation needs.
+
+# Background: What is Magnetic Media?
+
+Magnetic tape is a long, thin strip of material composed of several polymer
+layers. The “top coat” of the polymer contains magnetic pigments that encode
+audio or visual information, and it adheres to a “substrate” layer which
+supports the thin top coat (see Figure 1). On many tapes, especially those
+produced after the 1970s, a third layer of backing is attached to the other
+side of the substrate in order to reduce friction and static. For recording,
+playback and storage purposes, the tape is generally wound around reels or
+rolled up inside specialized plastic cassettes. Into the early twenty-first
+century, magnetic tape was used by television broadcasters, artists and the
+entertainment industry, government and nonprofit organizations, educators, and
+countless private individuals; all of whom recorded nigh-endless amounts of
+cultural heritage. 
+
+Unfortunately, magnetic tape has several inherent vices that have led to a
+preservation crisis. Mike Casey calls the magnetic media crisis a “perfect
+storm,” because the collections are growing in size and importance (through
+acquisitions, donations, and requests) as they are simultaneously fading into
+obsolescence. The problems that Casey identifies for archival institutions
+regarding magnetic media include “large numbers, obsolescence, degradation,
+high research value, and short time window.”  The first challenge archivists
+face is identifying just how much of the once-ubiquitous material exists. The
+next challenge is its limited lifespan. As magnetic media ages, the top coat
+and backing absorb moisture, causing the tape to become sticky and fall apart.
+This condition is known as “sticky-shed syndrome” and can render the item
+unplayable, as well as cause damage to playback equipment.
+
+Limited lifespan and large numbers make the magnetic media crisis daunting
+enough. However, not only are the old tapes degrading beyond readability, but
+the machines, hardware, and software needed to digitize valuable content are
+harder to come by and face obsolescence themselves. Furthermore, as the tools
+used to work with obsolete magnetic media slowly fade into memory so do the
+skills and institutional knowledge needed to operate legacy platforms.
+
+In some cases, the content on magnetic tapes represents the clearest picture of
+an event, person, or place in history, capturing speech patterns, rhythms, and
+even coughs as they sputtered out in real time. That information’s potential
+loss poses a serious threat to the historical record, if not addressed
+immediately. 
+
+# Literature Review: Admitting There’s a Problem
+
+The literature on magnetic media preservation is extensive but suffers from
+significant gaps—most notably a lack of quantitative data about the scope and
+scale of the preservation crisis. It is widely known that magnetic tape
+degrades over time and that digitizing the information stored on tape, in
+preparation to preserve, is difficult and expensive. As a result, several
+institutions have begun to develop and publish preservation plans. However,
+there appears to be no general survey of how much magnetic media exists in
+academic libraries and what state the collections are in. Not knowing the scale
+of magnetic media collections that exist in libraries today makes it difficult
+to present a clear picture of the crisis to administrators who ultimately
+determine resource allocation. Therefore, the researcher team sought to assess
+the amount of magnetic media in academic library collections, the formats in
+which it exists, and the ratio of each collection that has been digitized
+versus the amount left to preserve.
+
+Magnetic tape was a significant medium of information exchange for decades, and
+as such, is widely studied by archivists and industrial chemists alike.
+Detailed guides to identifying and preserving different magnetic tape formats
+are available for archivists accessioning new magnetic media. Libraries and
+government-backed groups have published extensive surveys of tape’s chemical
+properties and the potential negative reactions that it can undergo in response
+to age or poor storage conditions. The physical characteristics of magnetic
+tape are well-established and inform the context of our research.
+
+The literature also clearly speaks to the difficulties and high costs of
+digitization and preservation. For example, archivists at Indiana University
+Bloomington’s Media Digitization and Preservation Initiative (MDPI) estimates
+that their video collections will amount to 39PB of data that will need to be
+stored and maintained for years to come. That is almost two hundred thousand
+2TB external hard drives; not to mention the labor, infrastructure to store the
+servers, preserved magnetic media, backups, and software tools associated with
+the entire digitization and preservation workflow. Basic magnetic media
+preservation requires, but is not limited to, these tasks listed in the
+Association of Moving Image Archivists (AMIA) Videotape Preservation Fact
+Sheets: “controlled temperature and humidity environmental conditions,
+contamination and demagnetization prevention, tape inspection, tape cleaning,
+equipment maintenance, rejuvenating unplayable tapes, staff training, and then
+the entire re-formatting and conversion to digital process.” Within each
+top-level task, there are specialized tools, nearly-obsolete playback hardware,
+software, and meticulous techniques to conserve magnetic artifacts while
+digitizing the content to the “most faithful reproduction of an original work.“
+
+There are a variety of issues that result from magnetic material deterioration,
+one being sticky-shed syndrome (SSS), and few affordable and efficient
+troubleshooting techniques to address them. Many of these issues are barely
+irreversible. In the case of SSS, moisture and humidity break down the tape’s
+polymers that bind the magnetic particles, “causing the tape to become sticky
+or gummy”, leading to the tape shedding its magnetic coating and “results in
+loss of signal and therefore content.”  Alternative troubleshooting techniques
+have been proposed to address SSS without the need for losing the integrity of
+the magnetic tape and accelerating the degradation process, which is another
+issue from the most common baking technique when attempting to preserve signal
+and data loss from magnetic degradation. A 2013 article by Charles Richardson
+claims to have found a miracle cure for the blight; however, there are
+inconsistencies with his work. First, his paper does not provide enough detail
+to properly reproduce the scientific study used to generate his data. He claims
+that archivists should not use heat or chemicals on magnetic tape, then
+describes a process that uses chemicals on tape. He asserts that the process
+does not damage the tape, but removing the back layer and cleaning the oxide
+layer may prove extremely destructive to delicate tapes. Finally, he states
+that baking tapes is incredibly destructive; however, it is an industry
+standard that has been working for years. Contradictory studies like these can
+muddy the waters and make it difficult to create an effective digitization and
+preservation plan.
+
+With magnetic media at such a high risk for obsolescence and degradation, the
+first step in facing the crisis is to establish comprehensive preservation
+management solutions. Ross Harvey and Martha R. Mahard have attempted to
+establish best practices in their book The Preservation Management Handbook.
+According to Harvey and Mahard, the preservation management process is broken
+down into five steps. First, the archivist should conduct a survey of the
+facility that the collections are stored in to ensure proper temperature,
+humidity, and maintenance. Second, the archivist should ensure that the
+facility is prepared for any natural disasters that may occur in the local
+area. Third, the archivist should evaluate the collection using available
+collection management software such as UC Berkeley’s CALIPR tool or Columbia
+University’s AVDb software. Fourth, the archivist should create a plan of
+action based on the assessment and available resources. Finally, the archivist
+should frame that plan to mesh with higher echelon institutional values and
+mission statements. While this is a broad overview of managing the preservation
+process, it is easier said than done.
+
+While Harvey and Marhard’s book appears to be comprehensive, the text lacks
+depth and actual guidance on how to manage a collection in practice.
+Furthermore, pages dedicated to each item format lack any information on what
+or how to prioritize items for preservation; arguably one of the most important
+facets of archival collection management. Even though the paper is from 2014,
+the recommended tools are already outdated and utilize prioritization
+algorithms that are tailored to the institutions that created them. Most
+importantly, the tools are not relevant in taking on new knowledge about the
+degradation and obsolescence of magnetic media into account. For example,
+Columbia University’s AVDb software utilizes an algorithm which was based
+partly on Wheeler’s handbook and considers the majority of magnetic media to be
+as stable as Blu-ray discs. There is a huge flaw in the belief that magnetic
+media and even discs are stable preservation mediums—which is a completely
+separate research study—but as Jason Scott of the Internet Archive has
+repeatedly stated: disk storage is not more stable than tape. Each of these
+mediums requires a machine and energy to run in order to retrieve and process.
+All of these existing solutions have questionable dependencies to storage
+mediums that are increasingly becoming obsolete each passing year.
+
+In 2011, Indiana University Bloomington saw the failures in established
+preservation management paradigms and decided to become a national leader in
+creating a new standard. While managing preservation for their own institution,
+Indiana University Bloomington decided to write their Meeting the Challenge of
+Media Preservation report in such a way that any institution could implement
+good preservation management strategies modeled off of their example; this
+report includes digitization practices. Indiana University Bloomington's
+emphasis is largely based around film preservation, but the strategies and
+solutions provided in their report were purposely written to be inclusive to
+all items in an institution’s collection. This comprehensive report outlines
+all of Harvey and Mahard’s strategies, as they referenced the Indiana
+University Bloomington report in their literature, but focuses on the
+application rather than the theory. Any institution looking to properly address
+the magnetic media crisis could look to Indiana University Bloomington as a
+national leader and use what they have successfully implemented as a guide to
+their own institution-specific preservation and digitization management
+solutions. 
+
+The report describes how Indiana University Bloomington reached out to partners
+both on and off campus. Taking into consideration all stakeholders’ rights and
+responsibilities to preservation is also recommended as best practice by Mary
+Feeney out of the University of Arizona. Additionally, the report describes a
+workflow where minimal metadata is recorded during the digitization process.
+Larisa K. Miller at the Hoover Institution Archives describes a similar
+strategy while digitizing manuscripts, separating the metadata workflow from
+the digitization workflow to increase efficiency. Miller later described how
+digitizing with limited metadata could ameliorate the magnetic media crisis.
+The report by Indiana University Bloomington continues with numerous other
+strategies and solutions, establishing a standard that previously did not
+exist. 
+
+Even well-funded preservation projects can take several years to complete. The
+preservation management strategy that an institution has in place today can
+give researchers a good indication of where they will be a decade from now. If
+academic libraries do not have an actionable and solidified plan to digitize
+and preserve magnetic media at the time of our research survey, they will
+likely lose a significant portion of their magnetic media to degradation or
+obsolescence. While Indiana University Bloomington’s preservation program is
+more robust than any other institution in the United States, their preservation
+management strategies can be applied in varying degrees to any institution.
+These strategies will be considered best practices for the purpose of this
+study.
+
+Good preservation management strategies have been established in a few
+institutions, but in order to implement them, archivists must be aware of the
+stakes. By determining the amount of magnetic media in archives, the ratio of
+the media that has been digitized, and the formats on hand, the true scope of
+the problem can be assessed. Allowing archivists to better determine the time
+and money needed to save these valuable collections, and to advocate for
+greater resources with which to do so.
+
+# Methods
+
+
 This study involved mixed methodologies to answering the research question:
-*What is the preservation status of magnetic media collections in academic* 
-*libraries and archives, and to what degree are they endangered by degradation*
-*and obsolescence?* From a questionnaire fulfilled by a sample of academic
+_What is the preservation status of magnetic media collections in academic
+libraries and archives, and to what degree are they endangered by degradation
+and obsolescence?_ From a questionnaire fulfilled by a sample of academic
 libraries, quantitative data was gathered on collection size, format composition,
 and digitization percentage to evaluate the current state of magnetic media
 collections. Along with quantitative data, qualitative data was collected through
@@ -120,26 +314,39 @@ AMIA listservs, Twitter, and emails sent to individual contacts. Email messages
 were adapted depending on the profession/personal relationships we had with the 
 individual librarians and archivists. The questionnaire was initially circulated 
 to all listservs on the night of November 7th and closed on November 21, 2018—a 
-total of two full weeks. Throughout the two weeks in which the survey was open, 
-individual and institutional reference emails were messaged for continual outreach. 
-Once the questionnaire closed, data was cleaned and processed using OpenRefine and 
-Google Sheets. R was used to create visualizations and additional data analysis after 
-initial findings warranted a deeper evaluation.
+total of two full weeks. Throughout the two weeks in which the survey was open,
+individual and institutional reference emails were messaged for continual
+outreach.  Once the questionnaire closed, data was cleaned and processed using
+OpenRefine and Google Sheets. R was used to create visualizations and
+additional data analysis after initial findings warranted a deeper evaluation.
 
 ## Interviews 
 
-Phone, video, and in-person interviews with various audiovisual archivists, digital preservationists, and library managers—practitioners and researchers—provided enhanced qualitative understanding of the preservation management strategies for institutions dealing with magnetic media collections. While the main focus was on the questionnaire for the quantitative effects, approximately thirty-minute conversations with several professionals offered more in-depth conversations that could not be gleaned from a short online questionnaire. These interviews questions focused on topics such as:
+Phone, video, and in-person interviews with various audiovisual archivists,
+digital preservationists, and library managers—practitioners and
+researchers—provided enhanced qualitative understanding of the preservation
+management strategies for institutions dealing with magnetic media collections.
+While the main focus was on the questionnaire for the quantitative effects,
+approximately thirty-minute conversations with several professionals offered
+more in-depth conversations that could not be gleaned from a short online
+questionnaire. These interviews questions focused on topics such as:
+
 - How do institutions prioritize their collections?
 - How are institutions staffed and budgeted?
 - What resources are allocated to support the preservation program?
 
-Although conversations often departed and exceeded this script. In total, six interviews were conducted—four with archivists at academic libraries, one with an archivist at a state historical society, and one with an independent expert on magnetic tape preservation.
+Although conversations often departed and exceeded this script. In total, six
+interviews were conducted—four with archivists at academic libraries, one with
+an archivist at a state historical society, and one with an independent expert
+on magnetic tape preservation.
 
-Interview questions expanded on the obstacles archivists are facing in preserving magnetic media and offered more qualitative data-points on archivist’s experiences. These data-points include individual institutions’ successes and failures, challenges, actions institutions needs to make in order to address magnetic media obsolescence and degradation, etc.
+Interview questions expanded on the obstacles archivists are facing in
+preserving magnetic media and offered more qualitative data-points on
+archivist’s experiences. These data-points include individual institutions’
+successes and failures, challenges, actions institutions needs to make in order
+to address magnetic media obsolescence and degradation, etc.
 
 # Results
-
-## Estimated Count of Each Format Per Institution
 
 ```{r load_libraries}
 library(tidyverse)
@@ -184,15 +391,16 @@ tdatar <- all_responses %>%
     mutate(EstItemCount=TotalItems*Percentage/100) %>%
     mutate(FormatName=sub("Percentage_","",Format)) %>% 
     left_join(risk_factors%>%rename(FormatName=Format),by="FormatName")
-
 ```
 
-
-We received ``r nrow(all_responses)`` responses. 
-
-Each instituion's collection has a unique composition of item formats. Nearly all participating institutions have at least one VHS tape, but there are only 3 archives that need to deal with Digital 8. Either item counts or percentages of collection were very heterogeneous, suggesting that there is not one shared set of formats that would be served by a standard set of equipment. Would a centralized digitization center best address rare formats?
-
 ## Respondents by Institution Types (DELETE?)
+
+This study was targeted towards academic libraries as the main focus, 
+but other archival institutions have enthusiastically participated in
+our survey. 
+We received ``r nrow(all_responses)`` responses, while 
+``r sum(all_responses$InstitutionType!="Academic")`` of these do not 
+identify as "Academic".
 
 ```{r responses_by_instutition_type,cache=T}
 all_responses %>%
@@ -207,27 +415,11 @@ all_responses %>%
     }
 ```
 
-This research question specifically identified academic libraries as the main
-focus, but other archival institutions have enthusiastically participated in
-our survey. 
-
-Despite a chunk of participants being non-academic libraries, the
-research scope did not change and data from these other institutions are not
-included in the final analysis. 
-
-``r sum(all_responses$InstitutionType!="Academic")``
-of these are not "Academic"
-
-Shouldn't we include all of these? What's the difference?
-
-However, the data trends are interesting and
-can be applied to other institutions, there may be an opportunity for further
-research.
-
-
 ## Facility Environmental Conditions
 
-``r sum(is.na(all_responses$StorageConditions))`` didn't respond
+We asked respondents to categorize their storage conditions for their 
+collections. ``r sum(is.na(all_responses$StorageConditions))`` respondents 
+didn't include this information.
 
 ```{r responses_by_storage_conditions,cache=T,fig.height=7}
 all_responses %>%
@@ -394,11 +586,14 @@ g_storage_vs_complete <- all_responses %>%
     scale_x_continuous(breaks=seq(0,100,10))
     }
 g_storage_vs_complete
+```
 
 Many archivists have access to at leasat a temperature/humidity controlled storage facility and
 are expecting have most of their magntic media collection successfully digitized. However, some
 reportpoor storage conditions or a bleak outlook for their collection. Support and coordination
 amongst digital media archivists may help these archivists plan and advocate for their collection.
+
+```{r morestorage,cache=T,fig.height=7}
 
 g_storage <- all_responses %>%
     filter(!is.na(StorageConditions)) %>%
