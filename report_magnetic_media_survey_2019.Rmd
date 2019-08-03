@@ -593,8 +593,18 @@ ggsave("storageConditions_and_completionEstimate.svg",g_both,width=6,height=4)
 ggsave("storageConditions_and_completionEstimate.png",g_both,width=6,height=4)
 ```
 
+## There are not as many items left in formats at high-risk of decay
 
-## Quantity and Risk Factor by Format
+Using the classifications from 
+
+To prioritize digitization planning, we compared the sume total of items per
+format to each format's obsolescence risk factor (CLIR, 1995). We found a
+relatively low number of high-risk formats, suggesting that niche high-risk
+formats may be preservable with focused efforts. It is worth noting that this
+pattern may reflect a survivor's bias in collections. 
+
+Comparing the format's risk of decay with the estimated total item count
+allows us to prioritize what formats to target immediately with focused grants.
 
 ```{r format_counts_divided_x_by_risk,cache=T,fig.height=7}
 g <- tdatar %>% 
@@ -609,39 +619,19 @@ g <- tdatar %>%
     theme(axis.text.x=element_text(angle=90))+
     ylab("Total estimated items, across survey")+
     xlab("Risk Estimate")
-g
 
-g+geom_dotplot(binaxis="y",stackdir="center",binwidth=3e3)
-
-g+geom_dotplot(binaxis="y",stackdir="center",binwidth=0.05)+
-    scale_y_log10(labels=function(x){formatC(x,big.mark=",",format="d")},
-        breaks=c(500+0.5,1e3,2e3,5e3+0.5,1e4,2e4,5e4+1,1e5,2e5))
-
-ggsave("risk_and_totals_log.png",g+
-    geom_dotplot(binaxis="y",stackdir="center",binwidth=0.05)+
-    scale_y_log10(labels=function(x){formatC(x,big.mark=",",format="d")},
-        breaks=c(500+0.5,1e3,2e3,5e3+0.5,1e4,2e4,5e4+1,1e5,2e5)),
-    width=6,height=6)
-ggsave("risk_and_totals_log.svg",g+
-    geom_dotplot(binaxis="y",stackdir="center",binwidth=0.05)+
-    scale_y_log10(labels=function(x){formatC(x,big.mark=",",format="d")},
-        breaks=c(500+0.5,1e3,2e3,5e3+0.5,1e4,2e4,5e4+1,1e5,2e5)),
-    width=6,height=6)
-
-ggsave("risk_and_totals.png", g+
+g_risk_totals <- g+
     scale_y_continuous(labels=function(x){formatC(x,big.mark=",",format="d")},
         breaks=seq(0,2e5,2e4),limits=c(-2e4,NA))+
-        geom_dotplot(binaxis="y",stackdir="center",binwidth=3e3),
-    width=6,height=6)
-ggsave("risk_and_totals.svg", g+
-    scale_y_continuous(labels=function(x){formatC(x,big.mark=",",format="d")},
-        breaks=seq(0,2e5,2e4),limits=c(-2e4,NA))+
-        geom_dotplot(binaxis="y",stackdir="center",binwidth=3e3) ,
-    width=6,height=6)
-
+        geom_dotplot(binaxis="y",stackdir="center",binwidth=3e3) 
+g_risk_totals
 ```
 
-To prioritize digitization planning, we compared the sume total of items per format to each format's obsolescence risk factor (CLIR, 1995). We found a relatively low number of high-risk formats, suggesting that niche high-risk formats may be preservable with focused efforts. It is worth noting that this pattern may reflect a survivor's bias in collections. 
+```{r saving_risk_totals_figure,cache=T}
+ggsave("risk_and_totals.png",g_risk_totals,width=6,height=6)
+ggsave("risk_and_totals.svg",g_risk_totals,width=6,height=6)
+```
+
 
 ## Estimated Count of Each Format Per Institution
 
