@@ -427,6 +427,12 @@ While the majority of the participants maintain
 ``r sum(is.na(all_responses$StorageConditions))`` respondents 
 didn't include this information.
 
+Many archivists have access to at least a temperature/humidity controlled
+storage facility and are expecting have most of their magnetic media collection
+successfully digitized. However, some report poor storage conditions or a bleak
+outlook for their collection. Support and coordination amongst digital media
+archivists may help these archivists plan and advocate for their collection.
+
 ```{r responses_by_storage_conditions,cache=T,fig.height=7}
 all_responses %>%
     filter(!is.na(StorageConditions)) %>%
@@ -484,21 +490,27 @@ all_responses %>%
     }
 ```
 
-## Chance of Successful Preservation
+## Many items are estimated to decay before digitization
 
-Of the thirty-six respondents who chose to estimate how much magnetic material
+Of the ``r sum(!is.na(all_responses$PercentDigitizedBeforeUnplayable))``
+respondents who estimated how much magnetic material
 they would be able to digitize, eight—nearly a quarter—were confident they
 would process every item in their collection. However, almost as many
 institutions expressed doubt that they would digitize even a quarter of their
 collections before decay made their tapes unplayable. From a cursory
 examination, there does not appear to be a strict correlation between the size
-of the collection and the estimated digitization rate. Indiana University
-Bloomington, with 226,911 items, is confident they will digitize 99% of their
-holdings, while Wartburg College is bearish about the prospects for their
-15,308 items, estimating they will only digitize 10%. Table 2: Respondent
+of the collection and the estimated digitization rate. 
+
+what guidelines were supplied to help archivists make this assessment?
+
+Table 2: Respondent
 Institutions’ Digitization Progress Rates lists institutions’ current progress
 rate, calculated by their yearly digitization rate as a percentage of their
 total collection.
+
+The bimodality may reflect a binary choice for the respondent, but it is 
+striking that a significant fraction find themselves with little hope for
+preserving their collection.
 
 ```{r percent_completion,cache=T}
 all_responses %>%
@@ -506,14 +518,13 @@ all_responses %>%
     {
     ggplot(.)+theme_bw()+
     aes(x=as.numeric(PercentDigitizedBeforeUnplayable))+
-    stat_bin(binwidth=10,geom="bar")+
+    stat_bin(binwidth=05,geom="bar",col="white")+
     xlab("Self-assessed estimate of complete digitization\nbefore media is unplayable (binned into tenths)")+
-    ylab("Responses per bin (width")+
-    coord_flip()
+    ylab("Responses per bin (width")
     }
 ```
 
-```{r storage_conditions_and_completion,cache=T,fig.height=7}
+```{r storage_conditions_and_completion,cache=T,fig.height=7,eval=F}
 g_storage_vs_complete <- all_responses %>%
     filter(!is.na(StorageConditions)) %>%
     filter(!is.na(PercentDigitizedBeforeUnplayable)) %>%
@@ -537,13 +548,8 @@ g_storage_vs_complete <- all_responses %>%
 g_storage_vs_complete
 ```
 
-Many archivists have access to at leasat a temperature/humidity controlled storage facility and
-are expecting have most of their magntic media collection successfully digitized. However, some
-reportpoor storage conditions or a bleak outlook for their collection. Support and coordination
-amongst digital media archivists may help these archivists plan and advocate for their collection.
 
-```{r morestorage,cache=T,fig.height=7}
-
+```{r making_figures_for_poster,cache=T,fig.height=7}
 g_storage <- all_responses %>%
     filter(!is.na(StorageConditions)) %>%
     {
@@ -582,9 +588,7 @@ g_complete <- all_responses %>%
     scale_x_continuous(breaks=seq(0,100,10))+
     scale_y_continuous(breaks=seq(0,10,1))
     }
-g_both <- ggarrange(g_storage,g_complete,nrow=1,labels=c("A","B"))
-g_both
-
+g_both <- ggarrange(g_storage,g_complete,nrow=1,labels=c("A","B"),draw=F)
 ggsave("storageConditions_and_completionEstimate.svg",g_both,width=6,height=4)
 ggsave("storageConditions_and_completionEstimate.png",g_both,width=6,height=4)
 ```
