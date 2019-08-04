@@ -398,22 +398,6 @@ tdatar <- all_responses %>%
     left_join(risk_factors%>%rename(FormatName=Format),by="FormatName")
 ```
 
-## Respondents are geographically dispersed 
-
-The following map shows respondent count per state in white circles.
-Hue corresponds to average temperatures (HOW WAS THIS DEFINED I FORGOT),
-while intensity corresponds to total collection size.
-
-We were satisfied to see that we were able to reach institutions across the
-United States, but we do see a high concentration in New York and Oregon. 
-
-The temperature icons in Utah and Nebraska indicate two examples of large
-collections maintained in "room-temperature" conditions in warm climates, and
-are discussed more below.
-
-<img style="width:100%;" 
-    src="img/choropleth_magnetic_media_survey_2019.png"/>
-
 ## Respondents are mostly self-identified as academic
 
 This study was targeted towards academic libraries as the main focus, 
@@ -437,6 +421,92 @@ all_responses %>%
     ylab("Responses")
     }
 ```
+
+## Archivist skill self-evaluation ranges widely
+
+Respondents were asked to self-evaluate their skills
+
+<!-- yall should actually put the question here -->
+
+We expected to find that most archivists were above average, on average, but
+believe that the distribution of self-assessment reflects a healthy 
+self-criticism in the field. 
+
+Future work with surveys or interviews may find it useful to probe where 
+archivists feel their skills are falling short.
+
+```{r responses_by_self_reflection,cache=T,fig.height=7}
+all_responses %>%
+    filter(!is.na(PracticeSelfAssesment)) %>%
+    {
+    ggplot(.)+theme_bw()+
+    aes(x=PracticeSelfAssesment)+
+    geom_bar()+
+    scale_x_discrete(limits=c(
+            "Excellent",
+            "Above Average",
+            "Average",
+            "Below Average",
+            "Poor"
+            )
+        )+
+    geom_label(aes(label=..count..,y=..count..),stat="count")+
+    theme(axis.text.x=element_text(angle=90))+
+    xlab("")+
+    ylab("Responses")
+    }
+```
+
+Self-assessment of skill might reflect how the archivist perceives the 
+institution type, and so we compared self-assessed skill against different types
+of respondents.
+Since very few respondents that were not from "Academic"
+institutions, no conclusive pattern emerges.
+
+```{r skill_by_instutition_type,cache=T}
+all_responses %>%
+    filter(!is.na(PracticeSelfAssesment)) %>%
+    {
+    ggplot(.)+theme_bw()+
+    aes(x=InstitutionType,y=PracticeSelfAssesment)+
+    geom_point(aes(size=..count..),stat="bin_2d")+
+    scale_x_discrete(limits=names(sort(table(.$InstitutionType),decreasing=T)))+
+#    geom_label(aes(label=..count..,y=..count..),stat="count")+
+    scale_y_discrete(limits=c(
+            "Excellent",
+            "Above Average",
+            "Average",
+            "Below Average",
+            "Poor"
+            ))+
+    scale_size_continuous(breaks=seq(0,12,4))+
+    guides(fill=F)+
+    xlab("Institution type")+
+    ylab("Self-assessed skill")
+    }
+```
+
+Self-assessment is unreliable without criteria.
+Developing a standardized set of practices around these media formats would help
+archivists self-identify shortcomings and correct it themselves, given adequate
+support from their institution.
+
+## Respondents are geographically dispersed 
+
+The following map shows respondent count per state in white circles.
+Hue corresponds to average temperatures (HOW WAS THIS DEFINED I FORGOT),
+while intensity corresponds to total collection size.
+
+We were satisfied to see that we were able to reach institutions across the
+United States, but we do see a high concentration in New York and Oregon. 
+
+The temperature icons in Utah and Nebraska indicate two examples of large
+collections maintained in "room-temperature" conditions in warm climates, and
+are discussed more below.
+
+<img style="width:100%;" 
+    src="img/choropleth_magnetic_media_survey_2019.png"/>
+
 
 ## Most but not all facilities store media in controlled conditions
 
@@ -479,40 +549,6 @@ all_responses %>%
     }
 ```
 
-## Archivist skill self-evaluation ranges widely
-
-Respondents were asked to self-evaluate their skills
-
-<!-- yall should actually put the question here -->
-
-We expected to find that most archivists were above average, on average, but
-believe that the distribution of self-assessment reflects a healthy 
-self-criticism in the field. 
-
-Future work with surveys or interviews may find it useful to probe where 
-archivists feel their skills are falling short.
-
-```{r responses_by_self_reflection,cache=T,fig.height=7}
-all_responses %>%
-    filter(!is.na(PracticeSelfAssesment)) %>%
-    {
-    ggplot(.)+theme_bw()+
-    aes(x=PracticeSelfAssesment)+
-    geom_bar()+
-    scale_x_discrete(limits=c(
-            "Excellent",
-            "Above Average",
-            "Average",
-            "Below Average",
-            "Poor"
-            )
-        )+
-    geom_label(aes(label=..count..,y=..count..),stat="count")+
-    theme(axis.text.x=element_text(angle=90))+
-    xlab("")+
-    ylab("Responses")
-    }
-```
 
 ## Many items are estimated to decay before digitization
 
