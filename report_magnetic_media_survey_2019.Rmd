@@ -805,16 +805,19 @@ the estimated chance of digitization of their media before deterioration
 occurs. 
 
 
-
-
-
-
-
-correlation matrix
-
 # Conclusions
 
-While the data comes from a limited pool of academic archives and therefore cannot speak for all archives, the data can still serve to indicate what may be expected. Additional research addressing the preservation status of magnetic media collections in academic libraries, and to what degree are they endangered, could only make a stronger case for funding proposals. However, even without further research, it is imperative to report that archivists must begin by conducting assessments and evaluations of their collections in order to allocate resources to digitize their magnetic media collections. This is a crucial first step that needs to happen now, not later during the institution’s five-year plan. Moreover, this study illustrates that many institutions have not taken this first step.
+While the data comes from a limited pool of academic archives and therefore
+cannot speak for all archives, the data can still serve to indicate what may be
+expected. Additional research addressing the preservation status of magnetic
+media collections in academic libraries, and to what degree are they
+endangered, could only make a stronger case for funding proposals. However,
+even without further research, it is imperative to report that archivists must
+begin by conducting assessments and evaluations of their collections in order
+to allocate resources to digitize their magnetic media collections. This is a
+crucial first step that needs to happen now, not later during the institution’s
+five-year plan. Moreover, this study illustrates that many institutions have
+not taken this first step.
 
 # Future Opportunities
 
@@ -822,12 +825,15 @@ While the data comes from a limited pool of academic archives and therefore cann
 
 # Acknowledgements
 
-Many thanks to: our LIS 570 collaborators, Brian Click and Michael Kuster, who helped with the literature review, method design, and co-writing the original paper. Paul J. Weiss, LIS 570 instructor, who inspired and guided us to use this project to engage and contribute to the larger archives community. All survey respondents, interviewees, and archive listervs who welcomed our research to the discussion forums. Thank you SAA for accepted our research to the graduate student poster presentation. 
+Many thanks to: our LIS 570 collaborators, Brian Click and Michael Kuster, who
+helped with the literature review, method design, and co-writing the original
+paper. Paul J. Weiss, LIS 570 instructor, who inspired and guided us to use
+this project to engage and contribute to the larger archives community. All
+survey respondents, interviewees, and archive listervs who welcomed our
+research to the discussion forums. Thank you SAA for accepted our research to
+the graduate student poster presentation. 
 
-# Supplemental Analyses
-
-Because how often do you get to see the axes of variation amongst human 
-institutions? Be they collections or formats both are dope !
+# Supplemental analyses
 
 ```{r,cache=T}
 pca_datar <- tdatar %>% select(Key,TotalItems,FormatName,EstItemCount) %>%
@@ -840,50 +846,16 @@ matrix_by_media <- t(as.matrix(pca_datar[,-c(1,2)]))
 cluster_media <- hclust(dist(scale(matrix_by_media)))
 ```
 
-## PCA of media format
+## Do different institutions have patterns of collection composition?
 
-What major patterns of variation amongst formats are seen, with respect to their
-inventory in different institutions?
-The ways in which some factors are similar to each other and then distinct to others.Groupings of how formats are distributed differently. 
- 
+Looking between institutions, how are collections composed?
+Are there major patterns of the differences between institutions?
 
-```{r pca_media,cache=T}
-pca_media <- prcomp(t(matrix_by_media[apply(matrix_by_media,1,sum)>0,]),center=T,scale=T)
-
-media_pca_plot <- pca_media$rotation %>% 
-    {bind_cols(tibble(Format=rownames(.)),as.tibble(.))} %>%
-    select(Format,PC1,PC2,PC3,PC4,PC5,PC6) %>% 
-    ggplot()+theme_bw()+
-    aes(label=Format)+
-    geom_point()+
-    geom_label_repel()
-media_pca_plot + aes(x=PC1,y=PC2)
-```
-
-This is where you say there's a big main trend of the things in the top right
-are a group, things more to the left are not, this is probably generally 
-popularity.
-
-Stuff on bottom is the first distinct cluster.
-
-```{r pca_media2,cache=T}
-media_pca_plot + aes(x=PC3,y=PC4)
-```
-
-Betacam and Other are special, MiniDV in it's own special place
-
-
-## PCA of institutions
-
-What major patterns of variation amongst formats are seen, with respect to their
-inventory in different institutions?
-
-For completeness, these are all plots.
-
-Note plot 2 (3 vs 4) shows how museums and historical societies are way 
-different, probably have a lot of Other formats.
-
-More surveys needed
+We can use principal components analysis to pull out the major ways in which
+formats are distributed across institution. Principal components are ranked in 
+order of their magnitude, so 1 explains the most variation while 2 explains
+the next most amount of variation. Counts were scaled and centered before being
+analyzed in this way.
 
 ```{r pca_inst,cache=T}
 pca_inst <- prcomp(t(matrix_by_inst[apply(matrix_by_inst,1,sum)>0,] ),center=T,scale=T)
@@ -894,7 +866,10 @@ filtered_mbi <- matrix_by_inst[apply(matrix_by_inst,1,sum)>0,]
 pdatar <- pca_inst$rotation %>% 
     {bind_cols(tibble(Key=rownames(.)),as.tibble(.))} %>%
     select(Key,PC1,PC2,PC3,PC4,PC5,PC6) %>% 
-    left_join(all_responses%>%mutate(Key=as.character(Key)),by="Key") 
+    left_join(all_responses%>%mutate(Key=as.character(Key)),by="Key") %>%
+    gather(variable,value,starts_with("Percentage_")) %>% 
+    mutate(value=sub("%","",value)) %>%
+    spread(variable,value,fill=0) 
 
 inst_pca_plot <- pdatar %>%
     ggplot()+theme_bw()+
@@ -910,69 +885,26 @@ pc34 <- inst_pca_plot + aes(x=PC3,y=PC4)+
 pc56 <- inst_pca_plot + aes(x=PC5,y=PC6)+
     xlab(paste0("PC5 ",percent_varz[5],"% variance"))+
     ylab(paste0("PC6 ",percent_varz[6],"% variance"))
+```
 
+Do institution types have different patterns of composition?
+In the two largest axes of variation, this is not apparent, but in axes
+3 and 4 we see that museums and the only historical society are well seperated.
+
+```{r pca_inst_1,cache=T}
 pc12+aes(fill=InstitutionType)
 pc34+aes(fill=InstitutionType)
-pc56+aes(fill=InstitutionType)
 ```
 
-Huh what's on each of these axis? Why are museums different than academic 
-archives?
+What differences in formats underlie these patters?
+Why are museums different than academic archives?
 
-Here's a plot of the correlation of each format with each axis.
-Labelled are one-test significant for pearson correlation.
+We correlated the counts of each format with the position on each axes of 
+variation. Below these are plotted, and the labelled points are the correlations
+that were significantly correlated (spearman) by p < 0.05 with a bonferroni
+correction for six tests. 
 
 ```{r pca_dig_in_pearson,cache=T}
-z <- apply(pca_inst$rotation[,1:6],2,
-    function(x){
-       lapply(apply(filtered_mbi,2,cor.test,x,method="pearson"),
-            function(y){
-                data.frame(pval=y$p.value,est=y$estimate)
-            })
-    })
-rez <- data.frame(PC=NA,Format=NA,pval=NA,est=NA)
-for (i in names(z)) {
-    for (j in names(z[i][[1]])) {
-        rez <- rbind(rez,cbind(data.frame(PC=i,Format=j),z[i][[1]][j][[1]]))
-    }
-}
-rez <- rez[-1,]
-# god that's ugly, I forgot how to do a for loop for a bit there
-ggplot(rez)+theme_bw()+
-    aes(label=Format,x=-log10(pval),y=est)+
-    facet_wrap(~PC)+
-    geom_point()+
-    geom_label_repel(data=subset(rez,pval<0.05))
-```
-
-
-And if we replot some of those back on the PCA plots:
-Bridge the gap between institution types. Consider GLAM practices but also this shows the instittution type does hold different assets, which means different needs. 
-
-```{r replot_pcas,cache=T}
-pc14 <- inst_pca_plot+aes(x=PC1,y=PC4,fill=as.numeric(sub("%","",Percentage_Other)))+
-    xlab(paste0("PC1 ",percent_varz[1],"% variance"))+
-    ylab(paste0("PC4 ",percent_varz[4],"% variance"))+
-    scale_fill_distiller("Other",palette="Spectral",na.value="lightblue")
-pc14
-
-pc23 <- inst_pca_plot + aes(x=PC2,y=PC3)+
-    xlab(paste0("PC2 ",percent_varz[2],"% variance"))+
-    ylab(paste0("PC3 ",percent_varz[3],"% variance"))
-
-pc23+aes(fill=as.numeric(sub("%","",`Percentage_Other`)))+
-    scale_fill_distiller("Other",palette="Spectral",na.value="lightblue")
-
-pc23+aes(fill=0+
-        as.numeric(sub("%","",`Percentage_U-Matic`))+
-        as.numeric(sub("%","",`Percentage_Betacam & Betacam SP`))
-        )+
-    scale_fill_distiller("Umatic or Betacam",palette="Spectral",na.value="lightblue")
-
-```
-
-And for spearman
-```{r pca_dig_in_spearman,cache=T}
 z <- apply(pca_inst$rotation[,1:6],2,
     function(x){
        lapply(apply(filtered_mbi,2,cor.test,x,method="spearman"),
@@ -988,12 +920,101 @@ for (i in names(z)) {
 }
 rez <- rez[-1,]
 # god that's ugly, I forgot how to do a for loop for a bit there
+
 ggplot(rez)+theme_bw()+
     aes(label=Format,x=-log10(pval),y=est)+
     facet_wrap(~PC)+
     geom_point()+
-    geom_label_repel(data=subset(rez,pval<0.05))
+    geom_label_repel(data=subset(rez,pval<(0.05)/6))
 ```
+
+We see that Open Reel Audio and Compact Cassette are both well correlated with
+the two largest axes of variation, and may be indicative of large patterns of
+variation in collection formats
+
+```{r replot_openreelandcassette,cache=T}
+openreelandcassette <- inst_pca_plot+
+    aes(fill=0+
+        as.numeric(sub("%","",`Percentage_Open Reel Audio`))+
+        as.numeric(sub("%","",`Percentage_Compact Cassette`))
+        )+
+    scale_fill_distiller("openreelandcassette",palette="Spectral",na.value="white")
+openreelandcassette+aes(x=PC1,y=PC2)+
+    xlab(paste0("PC1 ",percent_varz[1],"% variance"))+
+    ylab(paste0("PC2 ",percent_varz[2],"% variance"))
+```
+
+On the third and fourth largest axes of variation, we examine how Betacam, 
+Umatic, and Other formats are distributed, and find that there are two clusters
+of large Betacam or Umatic collections amongst Academic institutions and that
+the museums and historical society have more Other format media (compare to
+plots above).
+
+```{r replot_pcas,cache=T}
+pc34 <- inst_pca_plot + aes(x=PC3,y=PC4)+
+    xlab(paste0("PC3 ",percent_varz[3],"% variance"))+
+    ylab(paste0("PC4 ",percent_varz[4],"% variance"))
+
+pc34+aes(fill=0+
+        as.numeric(sub("%","",`Percentage_U-Matic`))+
+        as.numeric(sub("%","",`Percentage_Betacam & Betacam SP`))
+        )+
+    scale_fill_distiller("Betacam or Umatic",palette="Spectral",
+        na.value="white")
+
+pc34+aes(fill=0+
+        as.numeric(sub("%","",`Percentage_Other`))
+        )+
+    scale_fill_distiller("Other",palette="Spectral",
+        na.value="white")
+```
+
+
+
+## What are the major patterns of variation amongst formats?
+
+
+
+Below, we see that most variation (PC1) separates a continuum of formats, 
+with common formats like VHS and Compact Cassette towards the right along with
+less common formats like Video 8, DAT, and DVCAM. This may also reflect that
+most less common formats may be noisily distributed, and by chance have patterns
+near or distinct from the common formats.
+
+```{r pca_media,cache=T}
+pca_media <- prcomp(t(matrix_by_media[apply(matrix_by_media,1,sum)>0,]),
+    center=T,scale=T)
+
+media_pca_plot <- pca_media$rotation %>% 
+    {bind_cols(tibble(Format=rownames(.)),as.tibble(.))} %>%
+    select(Format,PC1,PC2,PC3,PC4,PC5,PC6) %>% 
+    ggplot()+theme_bw()+
+    aes(label=Format)+
+    geom_point()+
+    geom_label_repel()
+media_pca_plot + aes(x=PC1,y=PC2)
+```
+
+The second component of variation separates the rare formats Microcassette, D3,
+D2, F-1, and Digital 8. It appears this variation may be driven by presence
+in the Nebraska collection, with one large and comprehensive collection 
+dwarfing the contributions of other collections.
+
+```{r}
+tdatar %>% filter(
+        FormatName %in% c(
+            "Microcassette","Digital 8","D3","D2","F-1"
+            ) &
+        !is.na(EstItemCount)
+        )%>%
+    select(State,FormatName,EstItemCount) %>%
+    arrange(FormatName,State) %>%
+    data.frame()
+```
+
+In the this, and in other components of variation of format distribution, it
+is likely that these apparent patterns are driven by noise in the sampling.
+Filtering and analyzing common formats may yield more interesting patterns.
 
 
 ```{r reigon,cache=T,echo=F,eval=F}
