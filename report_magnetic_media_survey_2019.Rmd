@@ -820,8 +820,11 @@ five-year plan. Moreover, this study illustrates that many institutions have
 not taken this first step.
 
 # Future Opportunities
-
-# References
+- Extend the questionnaire to more institutions for a diverse population of archives. Our initial call asked for academic institutions, but about 16% of submissions came from public or private companies, archives, historical societies, and museums.
+- Many funders support digitization and full preservation of AV magnetic materials. However, there are significatn barriers to entry. Applying for the grants is a time-intensive process (e.g. an archive compiled 221 pages of proof for a $20,500 grant) in order for institutions to receive a grant from $5k to $50k (CLIR 209). This grant does not guarantee administrative labor to be funded, as seen in the requirement that the digitization process cannot happen in-house, which makes employment and institutional dedication difficult to maintain when the work is being done off-site and short-term.
+- Older institutions tend to deviate from core fundamentals of archival practices. Backlogs will get bigger than capable of processing. How do we pause acquisitions to catch up?
+- Compare data to OCLC's recent publication _Assessing Needs of AV in Special Collections_ by Chela S. Weber.
+- Compare data to the soon-to-be published study on obsolescence of technical expertise within the field of moving image archiving and preservation by Brianna Toth. This will help us understand which playback decks/digitization transfer stations to prioritize because finding functioning machines, maintaining the machines, and finding knowledgeable personnel is a challenge within itself.
 
 # Acknowledgements
 
@@ -841,7 +844,7 @@ pca_datar <- tdatar %>% select(Key,TotalItems,FormatName,EstItemCount) %>%
 
 matrix_by_inst <- as.matrix(pca_datar[,-c(1,2)])
 rownames(matrix_by_inst) <- pca_datar[,1][[1]]
-cluster_inst <- hclust(dist(scale(matrix_by_inst))) 
+cluster_inst <- hclust(dist(scale(matrix_by_inst))
 matrix_by_media <- t(as.matrix(pca_datar[,-c(1,2)]))
 cluster_media <- hclust(dist(scale(matrix_by_media)))
 ```
@@ -1048,3 +1051,7 @@ making_that_map(dendrogram="col",Rowv=F,
     ylab="Respondent, ordered by estimated completion")
 dev.off()
 ```
+
+# References 
+
+(See original paper for the full bibliography [https://github.com/J-Nistler/quant_magnetic_media/blob/master/NguyenNistlerClickKuster_MagneticMediaSurvey_F2018.pdf])
