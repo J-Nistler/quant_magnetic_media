@@ -48,6 +48,11 @@ output:
 knitr::opts_chunk$set(echo=F,message=F,error=T,warning=F)
 ```
 
+```{r setting_figures_directory}
+fig_dir <- "./figures/"
+```
+
+
 <!-- this is commented out
     Do not start things with tabs or 4+ spaces
     Markdown interprets that as code
@@ -593,8 +598,10 @@ g_complete <- all_responses %>%
     scale_y_continuous(breaks=seq(0,10,1))
     }
 g_both <- ggarrange(g_storage,g_complete,nrow=1,labels=c("A","B"),draw=F)
-ggsave("storageConditions_and_completionEstimate.svg",g_both,width=6,height=4)
-ggsave("storageConditions_and_completionEstimate.png",g_both,width=6,height=4)
+ggsave(paste0(fig_dir,"storageConditions_and_completionEstimate.svg"),
+    g_both,width=6,height=4)
+ggsave(paste0(fig_dir,"storageConditions_and_completionEstimate.png"),
+    g_both,width=6,height=4)
 ```
 
 ## There are not as many items left in formats at high-risk of decay
@@ -632,8 +639,10 @@ g_risk_totals
 ```
 
 ```{r saving_risk_totals_figure,cache=T}
-ggsave("risk_and_totals.png",g_risk_totals,width=6,height=6)
-ggsave("risk_and_totals.svg",g_risk_totals,width=6,height=6)
+ggsave(paste0(fig_dir,"risk_and_totals.png"),
+    g_risk_totals,width=6,height=6)
+ggsave(paste0(fig_dir,"risk_and_totals.svg"),
+    g_risk_totals,width=6,height=6)
 ```
 
 ## Format abundances vary widely between institutions
@@ -664,8 +673,8 @@ g <- tdatar %>%
     xlab("")
     }
 g
-ggsave("items_per_respondent.png",g,width=6,height=5)
-ggsave("items_per_respondent.svg",g,width=6,height=5)
+ggsave(paste0(fig_dir,"items_per_respondent.png"),g,width=6,height=5)
+ggsave(paste0(fig_dir,"items_per_respondent.svg"),g,width=6,height=5)
 ```
 
 A similar pattern is seen in examining the proportion of each collection that is
@@ -740,7 +749,7 @@ k <- data.frame(fill=colorz[levels(risk_factors$Risk)],y=levels(risk_factors$Ris
         axis.line=element_blank())+
     ylab("")+xlab("")
 k
-ggsave("heatmap_key.png",k,width=3,height=2)
+ggsave(paste0(fig_dir,"heatmap_key.png"),k,width=3,height=2)
 
 tickfunc <- function() {
             breaks <- 10^seq(1,5,0.1)
