@@ -398,9 +398,10 @@ tdatar <- all_responses %>%
     left_join(risk_factors%>%rename(FormatName=Format),by="FormatName")
 ```
 
-## Response Collections by Region and Climate
+## Respondents are geographically dispersed 
 
-See chloreoplath files
+<iframe style="width:1200px;height:600px;" 
+    src="choropleth_magnetic_media_survey_2019.html"/>
 
 ## Respondents are mostly self-identified as academic
 
@@ -410,6 +411,8 @@ our survey.
 We received ``r nrow(all_responses)`` responses, while 
 ``r sum(all_responses$InstitutionType!="Academic",na.rm=T)`` of these do not 
 identify as "Academic".
+We proceeded to analyze all responses together, and later discuss apparent
+differences in collection composition.
 
 ```{r responses_by_instutition_type,cache=T}
 all_responses %>%
@@ -431,16 +434,17 @@ collections.
 The different environmental archival levels are based on the Video
 Preservation Fact Sheet from AMIA. 
 While the majority of the participants maintain 
-“temperature/humidity controlled” storage, some respondents report 
-“actively harmful” and “uncomfortable for humans” environments.
+"temperature/humidity controlled" storage, some respondents report 
+"actively harmful" and "uncomfortable for humans" environments.
 ``r sum(is.na(all_responses$StorageConditions))`` respondents 
 didn't include this information.
 
-Many archivists have access to at least a temperature/humidity controlled
-storage facility and are expecting have most of their magnetic media collection
-successfully digitized. However, some report poor storage conditions or a bleak
-outlook for their collection. Support and coordination amongst digital media
-archivists may help these archivists plan and advocate for their collection.
+Tools like the AMIA Video Preservation Fact Sheet are important for sharing
+institutional knowledge across the broader community, and surveys like this
+can help disseminate these tools.
+We are optimistic that this dataset will allow archivists with poor-quality 
+storage facilities to advocate for the support they need to bring their 
+collection to meet the average practice.
 
 ```{r responses_by_storage_conditions,cache=T,fig.height=7}
 all_responses %>%
