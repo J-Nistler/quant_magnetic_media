@@ -969,120 +969,15 @@ pc34+aes(fill=0+
         na.value="white")
 ```
 
+All together, this suggests that Betacam and Umatic are distinctly varying
+formats and so we may see heterogenity amongst institutions in holding these
+formats.
+The Other category distinguishes museums and the historical society that 
+responded, suggesting that these institutions have distinct formats not 
+addressed or categorized here.
 
 
-## What are the major patterns of variation amongst formats?
-
-
-
-Below, we see that most variation (PC1) separates a continuum of formats, 
-with common formats like VHS and Compact Cassette towards the right along with
-less common formats like Video 8, DAT, and DVCAM. This may also reflect that
-most less common formats may be noisily distributed, and by chance have patterns
-near or distinct from the common formats.
-
-```{r pca_media,cache=T}
-pca_media <- prcomp(t(matrix_by_media[apply(matrix_by_media,1,sum)>0,]),
-    center=T,scale=T)
-
-media_pca_plot <- pca_media$rotation %>% 
-    {bind_cols(tibble(Format=rownames(.)),as.tibble(.))} %>%
-    select(Format,PC1,PC2,PC3,PC4,PC5,PC6) %>% 
-    ggplot()+theme_bw()+
-    aes(label=Format)+
-    geom_point()+
-    geom_label_repel()
-media_pca_plot + aes(x=PC1,y=PC2)
-```
-
-The second component of variation separates the rare formats Microcassette, D3,
-D2, F-1, and Digital 8. It appears this variation may be driven by presence
-in the Nebraska collection, with one large and comprehensive collection 
-dwarfing the contributions of other collections.
-
-```{r}
-tdatar %>% filter(
-        FormatName %in% c(
-            "Microcassette","Digital 8","D3","D2","F-1"
-            ) &
-        !is.na(EstItemCount)
-        )%>%
-    select(State,FormatName,EstItemCount) %>%
-    arrange(FormatName,State) %>%
-    data.frame()
-```
-
-In the this, and in other components of variation of format distribution, it
-is likely that these apparent patterns are driven by noise in the sampling.
-Filtering and analyzing common formats may yield more interesting patterns.
-
-
-```{r reigon,cache=T,echo=F,eval=F}
-pc12+aes(fill=c(
-    `Wisconsin`="Central",
-    `Washington D.C.`="East",
-    `Massachusetts`="East",
-    `New York`="East",
-    `California`="West",
-    `Iowa`="Central",
-    `Hawaii`="Out",
-    `Pennsylvania`="East",
-    `Oregon`="West",
-    `Colorado`="West",
-    `Delaware`="East",
-    `Idaho`="West",
-    `Indiana`="Central",
-    `Maryland`="East",
-    `Washington`="West",
-    `Louisiana`="South",
-    `New Mexico`="West",
-    `Ohio`="Central",
-    `British Columbia`="West",
-    `Texas`="South",
-    `Alaska`="Out",
-    `Florida`="South",
-    `Missouri`="South",
-    `Nebraska`="Central",
-    `Utah`="West",
-    `Virginia`="East",
-    `Wyoming`="West",
-    `Kentucky`="East"
-    )[State])
-```
-
-
-
-```{r pheatmap,echo=F,eval=F}
-##library(pheatmap)
-##row_ann <- data.frame(
-##    Collection=str_c("C_",as.character(rownames(matrix_by_inst)[cluster_inst$order]))
-##    )
-##rownames(row_ann) <- as.character(row_ann[[1]])
-##
-##col_ann <- data.frame(Format=rownames(matrix_by_media)[cluster_media$order]) %>%
-##    left_join(totals_and_risks,by="Format") %>% select(-variable) %>%
-##    rename(`Total Items`=Total,`Format Risk`=Risk) %>%
-##    select(-`Total Items`)
-##rownames(col_ann) <- col_ann[[1]]
-##col_ann <- col_ann %>% select(-Format)
-##count_palette <- c("#FFFFFF",
-##    colorRampPalette((RColorBrewer::brewer.pal(n=7,name="YlGnBu")))(99)
-##    )
-##
-##g <- pheatmap( log10(heatmap_datar[,-c(1,2)]+400),
-##    color=count_palette,
-##    correlation_distance_rows="pearson",
-##    correlation_distance_cols="pearson",
-##    legend_breaks=log10(c(10,100,1000,3000,1e4,2.5e4,5e4)),
-##    legend_labels=c(10,100,1000,3000,1e4,2.5e4,5e4),
-##    cluster_rows=cluster_inst,
-##    cluster_cols=cluster_media,
-##    show_rownames=F,show_colnames=T,
-##    #annotation_row=row_ann,
-##    annotation_col=col_ann,
-##    annotation_legend=T)
-##g
-```
+<!--- supplemental making figures for poster, etc -->
 
 ```{r making_figures_for_poster,cache=T,fig.height=7}
 g_storage <- all_responses %>%
