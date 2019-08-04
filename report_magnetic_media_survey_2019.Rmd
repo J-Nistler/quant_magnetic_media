@@ -400,8 +400,19 @@ tdatar <- all_responses %>%
 
 ## Respondents are geographically dispersed 
 
-<iframe style="width:1200px;height:600px;" 
-    src="choropleth_magnetic_media_survey_2019.html"/>
+The following map shows respondent count per state in white circles.
+Hue corresponds to average temperatures (HOW WAS THIS DEFINED I FORGOT),
+while intensity corresponds to total collection size.
+
+We were satisfied to see that we were able to reach institutions across the
+United States, but we do see a high concentration in New York and Oregon. 
+
+The temperature icons in Utah and Nebraska indicate two examples of large
+collections maintained in "room-temperature" conditions in warm climates, and
+are discussed more below.
+
+<img style="width:100%;" 
+    src="img/choropleth_magnetic_media_survey_2019.png"/>
 
 ## Respondents are mostly self-identified as academic
 
