@@ -549,7 +549,6 @@ all_responses %>%
     }
 ```
 
-
 ## Many items are estimated to decay before digitization
 
 Of the ``r sum(!is.na(all_responses$PercentDigitizedBeforeUnplayable))``
@@ -579,6 +578,7 @@ all_responses %>%
     ggplot(.)+theme_bw()+
     aes(x=as.numeric(PercentDigitizedBeforeUnplayable))+
     stat_bin(binwidth=05,geom="bar",col="white")+
+    scale_y_continuous(breaks=seq(0,14,2))+
     xlab("Self-assessed estimate of complete digitization\nbefore media is unplayable (binned into tenths)")+
     ylab("Responses per bin (width")
     }
@@ -608,52 +608,6 @@ g_storage_vs_complete <- all_responses %>%
 g_storage_vs_complete
 ```
 
-
-```{r making_figures_for_poster,cache=T,fig.height=7}
-g_storage <- all_responses %>%
-    filter(!is.na(StorageConditions)) %>%
-    {
-    ggplot(.)+theme_article()+
-    aes(x=StorageConditions)+
-    scale_x_discrete(limits=c(
-            "Archival (vacuum sealed items, cold storage, etc.)",
-            "Temperature/Humidity controlled",
-            "Room temperature",
-            "Uncomfortable for human",
-            "Actively harmful (dirty, hot, humid, etc.)"
-            ),
-            labels=c(
-            "Archival\n(vacuum sealed items,\ncold storage, etc.)",
-            "Temperature/Humidity\ncontrolled",
-            "Room temperature",
-            "Uncomfortable\nfor humans",
-            "Actively harmful\n(dirty, hot, humid, etc.)"
-            )
-        )+
-    geom_bar(fill="grey40",color="black")+
-    #geom_label(aes(label=..count..,y=..count..),stat="count")+
-    scale_y_continuous(breaks=seq(0,40,5))+
-    theme(axis.text.x=element_text(angle=90))+
-    xlab("")+
-    ylab("Responses")
-    }
-g_complete <- all_responses %>%
-    filter(!is.na(PercentDigitizedBeforeUnplayable)) %>%
-    {
-    ggplot(.)+theme_article()+
-    aes(x=as.numeric(PercentDigitizedBeforeUnplayable))+
-    stat_bin(binwidth=10,center=5,geom="bar",fill="grey40",color="black")+
-    xlab("Self-assessed estimate of complete\ndigitization before media is unplayable")+
-    ylab("Responses")+
-    scale_x_continuous(breaks=seq(0,100,10))+
-    scale_y_continuous(breaks=seq(0,10,1))
-    }
-g_both <- ggarrange(g_storage,g_complete,nrow=1,labels=c("A","B"),draw=F)
-ggsave(paste0(fig_dir,"storageConditions_and_completionEstimate.svg"),
-    g_both,width=6,height=4)
-ggsave(paste0(fig_dir,"storageConditions_and_completionEstimate.png"),
-    g_both,width=6,height=4)
-```
 
 ## There are not as many items left in formats at high-risk of decay
 
@@ -689,13 +643,6 @@ g_risk_totals <- g+
 g_risk_totals
 ```
 
-```{r saving_risk_totals_figure,cache=T}
-ggsave(paste0(fig_dir,"risk_and_totals.png"),
-    g_risk_totals,width=6,height=6)
-ggsave(paste0(fig_dir,"risk_and_totals.svg"),
-    g_risk_totals,width=6,height=6)
-```
-
 ## Format abundances vary widely between institutions
 
 Nearly
@@ -705,8 +652,10 @@ collection were very heterogeneous, suggesting that there is not one shared set
 of formats that would be served by a standard set of equipment. Would a
 centralized digitization center best address rare formats?
 
+Each y-axis is in log-scale, and so differences are exponential.
+
 ```{r total_numbers_of_items_each_format_dist,cache=T}
-g <- tdatar %>% 
+g_items_per <- tdatar %>% 
     {
     ggplot(.)+
     theme_bw()+
@@ -720,19 +669,17 @@ g <- tdatar %>%
             arrange(-z)%>%pull(FormatName)
         )+
     theme(axis.text.x=element_text(angle=90))+
-    ylab("Each respondent's estimated items per format")+
+    ylab("Each respondent's estimated\nitems per format")+
     xlab("")
     }
-g
-ggsave(paste0(fig_dir,"items_per_respondent.png"),g,width=6,height=5)
-ggsave(paste0(fig_dir,"items_per_respondent.svg"),g,width=6,height=5)
+g_items_per
 ```
 
 A similar pattern is seen in examining the proportion of each collection that is
 a format.
 
 ```{r proportion_of_items_each_format_dist,cache=T}
-g <- tdatar %>% 
+g_items_prop <- tdatar %>% 
     {
     ggplot(.)+
     theme_bw()+
@@ -740,46 +687,48 @@ g <- tdatar %>%
     geom_boxplot(outlier.alpha=0,color="grey50")+
     geom_dotplot(binaxis="y",stackdir="center",alpha=1.0,binwidth=0.02)+
     scale_y_log10(labels=function(x){formatC(x,big.mark=",",format="d")},
-        limits=c(0.9,NA))+
+        limits=c(0.9,NA),breaks=c(1,10,25,51,100))+
     scale_x_discrete(
         limits=group_by(.,FormatName)%>%
             summarize(z=sum(EstItemCount,na.rm=T))%>%
             arrange(-z)%>%pull(FormatName)
         )+
     theme(axis.text.x=element_text(angle=90))+
-    ylab("Each respondent's estimated items per format")+
+    ylab("The percentage of each collection\nthat is each format")+
     xlab("")
     }
-g
+g_items_prop
 ```
 
 ## Overall perspective on survey results
 
-This heat map illustrates an aggregation of the above charts and graphs. The
-hierarchical clustering shows how each format is related or unrelated
-considering the factors of obsolesence risk and quantity held within
-participating archives' collections. At the top of the chart, there are two
-major goups: (1) VHS, open reel audio, and compact cassettes, and (2) all other
-formats. This distinction is from the quantity that instutions hold, in that
-group 1 is more likely to have a higher quantity than group 2. From quantity
-and risk factor, there is a noticeable relationship with Betacam and u-matic.
-This suggests that if an archive carries of one of these format types, they are
-likely to also have the latter in their collection. This further leads to the
-idea that training or programming for Betacam and U-matic together could be an
-efficient approach to dealing with those collections.
+To summarize the collection compositions across institutions and formats,
+we display them as a heatmap below.
+The blue color key denotes the total estimated items of that format in that
+respondent's collection, on a logarithmic scale (exponentially increasing).
+Format type is each column, labelled at the bottom. 
+Each respondent is a row, with the estimated percentage of completion labelled.
+
+Hierarchical clustering is a method to compare columns or rows to each other,
+such that adjacent rows are more similar than distant rows. When this is done,
+a tree is drawn along the side that is clustered, denoting how "related" the
+rows or columns are to each other. 
 
 
-```{r 2nd_heatmap_counts,fig.height=9,fig.width=9,cache=T}
+```{r heatmap_data,cache=T}
 heatmap_datar_counts <- tdatar %>% 
     filter(EstItemCount>0) %>%
     select(Key,State,InstitutionType,TotalItems,
         PercentDigitizedBeforeUnplayable,FormatName,EstItemCount) %>%
     spread(FormatName,EstItemCount,fill=0) %>%
     arrange(-as.numeric(PercentDigitizedBeforeUnplayable))
-heatmap_datar_counts%>%pull(PercentDigitizedBeforeUnplayable)
 
 counts_matrix <- as.matrix(log10(heatmap_datar_counts[,-c(1,2,3,4,5)]+1))
+```
 
+The color scale at the top denotes the risk category.
+
+```{r risk_key,fig.height=2,fig.width=2,cache=T}
 # Thanks colorbrewer2 website!
 colorz <- setNames(c('#ffffb2','#fecc5c','#fd8d3c','#f03b20','#bd0026'),
         levels(risk_factors$Risk))
@@ -800,8 +749,9 @@ k <- data.frame(fill=colorz[levels(risk_factors$Risk)],y=levels(risk_factors$Ris
         axis.line=element_blank())+
     ylab("")+xlab("")
 k
-ggsave(paste0(fig_dir,"heatmap_key.png"),k,width=3,height=2)
+```
 
+```{r heatmapz_func,cache=T}
 tickfunc <- function() {
             breaks <- 10^seq(1,5,0.1)
             which_ones <- c(11,21,31,41)
@@ -811,45 +761,41 @@ tickfunc <- function() {
                 ))
            }
 
-
-heatmap.2(counts_matrix,
-    key.xlab="Estimated Items",
-    col=colorRampPalette(brewer.pal(n=9,name="PuBuGn"))(100),
-    ColSideColors=risk_palette,
-    margins=c(08,5),
-    labRow=ifelse(!is.na(heatmap_datar_counts$PercentDigitizedBeforeUnplayable),
-        paste0(heatmap_datar_counts$PercentDigitizedBeforeUnplayable,"%"),"no data"),
-    srtCol=45,
-    density.info="none",
-    trace="none",
-    dendrogram="col",
-    Rowv=F,
-    reorderfun=function(d, w) rev(reorder(d, w, agglo.FUN = mean)),
-    ylab="Respondent, ordered by estimated completion",
-    key.xtickfun=tickfunc
-    )
-#svg("magnetic_heatmap_ordered_by_chance_completion_at_top.svg",width=6,height=6)
-# dev.off()
-
-#svg("magnetic_heatmap_clustered_rows.svg",width=6,height=6)
-heatmap.2(counts_matrix,
-    key.xlab="Estimated Items",
-    col=colorRampPalette(brewer.pal(n=9,name="PuBuGn"))(100),
-    ColSideColors=risk_palette,
-    margins=c(08,5),
-    labRow=ifelse(!is.na(heatmap_datar_counts$PercentDigitizedBeforeUnplayable),
-        paste0(heatmap_datar_counts$PercentDigitizedBeforeUnplayable,"%"),"no data"),
-    srtCol=45,
-    density.info="none",
-    trace="none",
-    dendrogram="both",
-    reorderfun=function(d, w) rev(reorder(d, w, agglo.FUN = mean)),
-    ylab="Respondent",
-    key.xtickfun=tickfunc
-    )
-#dev.off()
-
+making_that_map <- function(...) {
+    heatmap.2(counts_matrix,
+        col=colorRampPalette(brewer.pal(n=9,name="PuBuGn"))(100),
+        ColSideColors=risk_palette,
+        srtCol=45,
+        labRow=ifelse(!is.na(heatmap_datar_counts$PercentDigitizedBeforeUnplayable),
+            paste0(heatmap_datar_counts$PercentDigitizedBeforeUnplayable,"%"),"no data"),
+        key.xlab="Estimated Items",
+        density.info="none",
+        trace="none",
+        reorderfun=function(d, w) rev(reorder(d, w, agglo.FUN = mean)),
+        key.xtickfun=tickfunc,
+        ...
+        )
+}
 ```
+
+```{r heatmapz_1,fig.height=9,fig.width=9,cache=T}
+making_that_map(dendrogram="both",
+    margins=c(08,7),
+    ylab="Respondent, labelled with\npercentage of estimated completion")
+```
+
+
+We qualitatively identify that VHS, open reel audio, and compact cassettes are
+one group of abundant and commonly held items, and appear to be the bulk of
+many collections. Similarly, U-Matic and Betacam formats are similar, and 
+together with Open Reel Video and MiniDV form another cluster of somewhat
+common formats with less abundance but higher risk.
+
+It appears that VHS, Compact Cassette, and Open Reel Audio are maybe the most 
+commonly encountered cluster of formats. However, the higher risk Betacam and 
+U-matic, and perhaps Open Reel Video with MiniDV, could be grouped for 
+training, programming, and equipment in preserving these common but higher risk
+formats.
 
 Clustering of the format's similarities shows that VHS, Compact Cassette, and
 Open Reel Audio tend to have similar patterns of abundance across collections.
@@ -857,6 +803,10 @@ U-Matic, Betacam, Open Reel Video, and MiniDV show a similar cluster of
 co-variability. Each row denotes an institution's response, and is sorted by
 the estimated chance of digitization of their media before deterioration
 occurs. 
+
+
+
+
 
 
 
@@ -1111,4 +1061,74 @@ pc12+aes(fill=c(
 ##    annotation_col=col_ann,
 ##    annotation_legend=T)
 ##g
+```
+
+```{r making_figures_for_poster,cache=T,fig.height=7}
+g_storage <- all_responses %>%
+    filter(!is.na(StorageConditions)) %>%
+    {
+    ggplot(.)+theme_article()+
+    aes(x=StorageConditions)+
+    scale_x_discrete(limits=c(
+            "Archival (vacuum sealed items, cold storage, etc.)",
+            "Temperature/Humidity controlled",
+            "Room temperature",
+            "Uncomfortable for human",
+            "Actively harmful (dirty, hot, humid, etc.)"
+            ),
+            labels=c(
+            "Archival\n(vacuum sealed items,\ncold storage, etc.)",
+            "Temperature/Humidity\ncontrolled",
+            "Room temperature",
+            "Uncomfortable\nfor humans",
+            "Actively harmful\n(dirty, hot, humid, etc.)"
+            )
+        )+
+    geom_bar(fill="grey40",color="black")+
+    #geom_label(aes(label=..count..,y=..count..),stat="count")+
+    scale_y_continuous(breaks=seq(0,40,5))+
+    theme(axis.text.x=element_text(angle=90))+
+    xlab("")+
+    ylab("Responses")
+    }
+g_complete <- all_responses %>%
+    filter(!is.na(PercentDigitizedBeforeUnplayable)) %>%
+    {
+    ggplot(.)+theme_article()+
+    aes(x=as.numeric(PercentDigitizedBeforeUnplayable))+
+    stat_bin(binwidth=10,center=5,geom="bar",fill="grey40",color="black")+
+    xlab("Self-assessed estimate of complete\ndigitization before media is unplayable")+
+    ylab("Responses")+
+    scale_x_continuous(breaks=seq(0,100,10))+
+    scale_y_continuous(breaks=seq(0,10,1))
+    }
+g_both <- ggarrange(g_storage,g_complete,nrow=1,labels=c("A","B"),draw=F)
+
+ggsave(paste0(fig_dir,"storageConditions_and_completionEstimate.svg"),
+    g_both,width=6,height=4)
+ggsave(paste0(fig_dir,"storageConditions_and_completionEstimate.png"),
+    g_both,width=6,height=4)
+ggsave(paste0(fig_dir,"heatmap_key.png"),k,width=3,height=2)
+ggsave(paste0(fig_dir,"items_per_respondent.png"),g_items_per,width=6,height=5)
+ggsave(paste0(fig_dir,"items_per_respondent.svg"),g_items_per,width=6,height=5)
+ggsave(paste0(fig_dir,"risk_and_totals.png"),
+    g_risk_totals,width=6,height=6)
+ggsave(paste0(fig_dir,"risk_and_totals.svg"),
+    g_risk_totals,width=6,height=6)
+```
+
+```{r heatmapz_1_save,fig.height=9,fig.width=9,cache=T,echo=F}
+svg("magnetic_heatmap_clustered_rows.svg",width=6,height=6)
+making_that_map(dendrogram="both",
+    margins=c(08,7),
+    ylab="Respondent, labelled with\npercentage of estimated completion")
+dev.off()
+```
+
+```{r heatmapz_2,fig.height=9,fig.width=9,cache=T,echo=F}
+svg("magnetic_heatmap_ordered_by_chance_completion_at_top.svg",width=6,height=6)
+making_that_map(dendrogram="col",Rowv=F,
+    margins=c(08,5),
+    ylab="Respondent, ordered by estimated completion")
+dev.off()
 ```
